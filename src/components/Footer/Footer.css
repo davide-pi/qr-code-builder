@@ -1,0 +1,74 @@
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 56px;
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+/* Safe area for notched devices */
+@supports (padding: max(0px)) {
+  .app-footer {
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(56px + env(safe-area-inset-bottom));
+  }
+}
+
+.footer-content {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.app-footer p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.app-footer a {
+  color: white;
+  text-decoration: underline;
+  transition: opacity 0.2s ease;
+}
+
+.app-footer a:hover {
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .app-footer {
+    height: 50px;
+  }
+
+  .footer-content {
+    padding: 0 1rem;
+  }
+
+  .app-footer p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Small mobile breakpoint */
+@media (max-width: 480px) {
+  .app-footer {
+    height: 48px;
+  }
+
+  .footer-content {
+    padding: 0 0.75rem;
+  }
+
+  .app-footer p {
+    font-size: 0.75rem;
+  }
+}
