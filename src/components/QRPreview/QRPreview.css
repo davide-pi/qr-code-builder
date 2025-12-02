@@ -1,0 +1,337 @@
+.qr-preview-section {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 6px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 112px - 4rem);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.qr-preview-section h2 {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+.qr-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 0.9rem;
+}
+
+.qr-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--card-bg-secondary);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  width: 100%;
+  height: 500px;
+  min-height: 500px;
+  max-height: 500px;
+  overflow: hidden;
+  /* Checkered background to show transparency */
+  background-image:
+    linear-gradient(45deg, var(--checkered-color) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--checkered-color) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--checkered-color) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--checkered-color) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.qr-preview.has-error {
+  position: relative;
+}
+
+.qr-preview.has-error canvas,
+.qr-preview.has-error svg {
+  opacity: 0.3;
+  filter: blur(2px);
+}
+
+.qr-empty-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.qr-preview canvas,
+.qr-preview svg {
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  width: auto;
+  object-fit: contain;
+}
+
+.action-buttons {
+  margin-bottom: 0.75rem;
+}
+
+.btn-copy {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-copy:hover {
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  filter: brightness(0.9);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-copy:active {
+  transform: translateY(0);
+}
+
+.btn-copy:focus {
+  outline: none;
+}
+
+.btn-copy:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.5), 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-copy:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-copy:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-copy svg {
+  flex-shrink: 0;
+}
+
+.export-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 120px;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-export {
+  background: var(--card-bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-export:hover {
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-export:focus {
+  outline: none;
+}
+
+.btn-export:focus-visible {
+  outline: none;
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.4);
+}
+
+.btn-export:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-export:disabled:hover {
+  background: var(--card-bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-export svg {
+  flex-shrink: 0;
+}
+
+.btn-secondary {
+  background: var(--card-bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: var(--input-bg);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.btn-small {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  flex: 0;
+  min-width: auto;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+/* ========== RESPONSIVE STYLES ========== */
+
+/* Tablet breakpoint */
+@media (max-width: 900px) {
+  .qr-preview-section {
+    padding: 1rem;
+  }
+
+  .qr-preview-section h2 {
+    font-size: 1.35rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .qr-preview {
+    margin-bottom: 1.25rem;
+  }
+}
+
+/* Mobile breakpoint */
+@media (max-width: 768px) {
+  .qr-preview-section {
+    padding: 1rem;
+    border-radius: 10px;
+  }
+
+  .qr-preview-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+  }
+
+  .qr-preview {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+  }
+
+  /* Larger touch targets for buttons */
+  .btn {
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+
+  .btn-copy {
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+
+  .export-buttons {
+    gap: 0.5rem;
+  }
+
+  .btn-export {
+    min-width: 100px;
+    padding: 0.85rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .action-buttons {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Small mobile breakpoint */
+@media (max-width: 480px) {
+  .qr-preview-section {
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .qr-preview-section h2 {
+    font-size: 1.1rem;
+  }
+
+  .qr-preview {
+    padding: 0.5rem;
+  }
+
+  /* Stack export buttons on very small screens */
+  .export-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    min-width: 100%;
+  }
+
+  .btn-export {
+    min-width: 100%;
+  }
+}
