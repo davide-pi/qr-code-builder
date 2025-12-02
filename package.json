@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "homepage": "https://free-qr-builder.netlify.app",
   "scripts": {
     "dev": "vite",
