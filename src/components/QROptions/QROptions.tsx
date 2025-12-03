@@ -1,29 +1,10 @@
-import { useRef, useState, useCallback, useMemo } from 'react';
-import type { GradientType, ErrorCorrectionLevel } from 'qr-code-styling';
+import { useRef, useState, useCallback } from 'react';
+import type { GradientType } from 'qr-code-styling';
 import type { QROptions as QROptionsType, GradientConfig, ColorPreset } from '../../types/qr';
 import { dotTypes, cornerSquareTypes, cornerDotTypes, gradientTypes, errorCorrectionLevels, defaultColorPresets } from '../../types/qr';
 import StylePicker, { DotStylePreview, CornerSquarePreview, CornerDotPreview } from '../StylePicker/StylePicker';
-import { Undo2, Redo2, RotateCcw, ChevronDown, Upload, AlertCircle, ChevronsDownUp, ChevronsUpDown } from 'lucide-react';
+import { Undo2, Redo2, RotateCcw, ChevronDown, Upload, ChevronsDownUp, ChevronsUpDown } from 'lucide-react';
 import './QROptions.css';
-
-const getMaxCapacity = (errorLevel: string): number => {
-  // Max byte capacity for version 40 QR codes (most content uses byte mode)
-  const capacities: Record<string, number> = {
-    'L': 2953,
-    'M': 2331,
-    'Q': 1663,
-    'H': 1273,
-  };
-  return capacities[errorLevel] || 1663;
-};
-
-interface ValidationResult {
-  isValid: boolean;
-  errorMessage: string | null;
-  charCount: number;
-  maxChars: number;
-  percentage: number;
-}
 
 interface QROptionsProps {
   options: QROptionsType;
@@ -88,38 +69,14 @@ export default function QROptions({
 }: QROptionsProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [allSectionsOpen, setAllSectionsOpen] = useState(true);
+  const [allSectionsOpen, setAllSectionsOpen] = useState(false);
   const [sectionsState, setSectionsState] = useState({
-    content: true,
-    sizeLayout: true,
+    errorCorrection: false,
     style: true,
-    colors: true,
+    colors: false,
     background: false,
     logo: false,
   });
-
-  // Validate input data
-  const validation = useMemo((): ValidationResult => {
-    const maxChars = getMaxCapacity(options.errorCorrectionLevel);
-    const charCount = options.data.length;
-    const percentage = Math.min((charCount / maxChars) * 100, 100);
-
-    let errorMessage: string | null = null;
-
-    if (charCount === 0) {
-      errorMessage = 'Content is required';
-    } else if (charCount > maxChars) {
-      errorMessage = `Content exceeds maximum capacity of ${maxChars.toLocaleString()} characters`;
-    }
-
-    return {
-      isValid: errorMessage === null,
-      errorMessage,
-      charCount,
-      maxChars,
-      percentage,
-    };
-  }, [options.data, options.errorCorrectionLevel]);
 
   // Process image file
   const processImageFile = useCallback((file: File) => {
@@ -172,8 +129,7 @@ export default function QROptions({
     const newState = !allSectionsOpen;
     setAllSectionsOpen(newState);
     setSectionsState({
-      content: newState,
-      sizeLayout: newState,
+      errorCorrection: newState,
       style: newState,
       colors: newState,
       background: newState,
@@ -227,44 +183,10 @@ export default function QROptions({
         </div>
       </div>
 
-      {/* Content Section */}
-      <Section title="Content" isOpen={sectionsState.content} onToggle={() => toggleSection('content')}>
+      {/* Error Correction Section */}
+      <Section title="Error Correction" isOpen={sectionsState.errorCorrection} onToggle={() => toggleSection('errorCorrection')}>
         <div className="option-group">
-          <label htmlFor="data">QR Code Data</label>
-          <div className="input-with-validation">
-            <div className="input-wrapper">
-              <input
-                type="text"
-                id="data"
-                value={options.data}
-                onChange={(e) => onUpdateOption('data', e.target.value)}
-                placeholder="Enter URL or text"
-                className={!validation.isValid ? 'input-error' : ''}
-                aria-invalid={!validation.isValid}
-                aria-describedby={!validation.isValid ? 'data-error' : undefined}
-              />
-              {!validation.isValid && (
-                <span
-                  className="error-icon"
-                  title={validation.errorMessage || ''}
-                  role="img"
-                  aria-label={validation.errorMessage || ''}
-                  id="data-error"
-                >
-                  <AlertCircle size={16} />
-                </span>
-              )}
-            </div>
-            <div className="char-count-row">
-              <span className={`char-count ${validation.percentage > 90 ? 'warning' : ''} ${validation.percentage >= 100 ? 'danger' : ''}`}>
-                {validation.charCount.toLocaleString()} / {validation.maxChars.toLocaleString()}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="option-group">
-          <label id="error-correction-label">Error Correction</label>
+          <label id="error-correction-label">Level</label>
           <div
             className="error-correction-options"
             role="listbox"
@@ -274,7 +196,7 @@ export default function QROptions({
               <button
                 key={level.value}
                 className={`ec-btn ${options.errorCorrectionLevel === level.value ? 'active' : ''}`}
-                onClick={() => onUpdateOption('errorCorrectionLevel', level.value as ErrorCorrectionLevel)}
+                onClick={() => onUpdateOption('errorCorrectionLevel', level.value)}
                 onKeyDown={(e) => {
                   let newIndex: number | null = null;
                   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
@@ -285,7 +207,7 @@ export default function QROptions({
                     newIndex = (index - 1 + errorCorrectionLevels.length) % errorCorrectionLevels.length;
                   }
                   if (newIndex !== null) {
-                    onUpdateOption('errorCorrectionLevel', errorCorrectionLevels[newIndex].value as ErrorCorrectionLevel);
+                    onUpdateOption('errorCorrectionLevel', errorCorrectionLevels[newIndex].value);
                     const buttons = e.currentTarget.parentElement?.querySelectorAll('.ec-btn');
                     (buttons?.[newIndex] as HTMLElement)?.focus();
                   }
@@ -299,33 +221,6 @@ export default function QROptions({
               </button>
             ))}
           </div>
-        </div>
-      </Section>
-
-      {/* Size & Layout Section */}
-      <Section title="Size & Layout" isOpen={sectionsState.sizeLayout} onToggle={() => toggleSection('sizeLayout')}>
-        <div className="option-group">
-          <label htmlFor="size">Size: {options.size}px</label>
-          <input
-            type="range"
-            id="size"
-            min="100"
-            max="500"
-            value={options.size}
-            onChange={(e) => onUpdateOption('size', Number(e.target.value))}
-          />
-        </div>
-
-        <div className="option-group">
-          <label htmlFor="margin">Margin: {options.margin}px (max: {Math.floor(options.size * 0.15)}px)</label>
-          <input
-            type="range"
-            id="margin"
-            min="0"
-            max={Math.floor(options.size * 0.15)}
-            value={Math.min(options.margin, Math.floor(options.size * 0.15))}
-            onChange={(e) => onUpdateOption('margin', Number(e.target.value))}
-          />
         </div>
       </Section>
 

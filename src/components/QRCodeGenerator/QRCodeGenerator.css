@@ -1,8 +1,8 @@
 .qr-generator {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 2rem;
-  max-width: 1200px;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 1.5rem;
+  max-width: 1600px;
   width: 100%;
   margin: 0 auto;
   padding: 2rem;
@@ -10,23 +10,63 @@
   overflow: hidden;
 }
 
-/* Tablet breakpoint */
-@media (max-width: 900px) {
+/* Large tablet breakpoint - switch to 2 columns (data+preview, options below) */
+@media (max-width: 1200px) {
   .qr-generator {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
     gap: 1.5rem;
     padding: 1.5rem;
-    max-width: 100%;
+  }
+
+  .qr-generator > :nth-child(1) { /* QRDataInput */
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .qr-generator > :nth-child(2) { /* QRPreview */
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .qr-generator > :nth-child(3) { /* QROptions */
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 }
 
-/* Mobile breakpoint - stack columns */
+/* Tablet breakpoint */
+@media (max-width: 900px) {
+  .qr-generator {
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+}
+
+/* Mobile breakpoint - stack all columns */
 @media (max-width: 768px) {
   .qr-generator {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
     height: auto;
     overflow: visible;
     padding: 1rem;
     gap: 1rem;
+  }
+
+  .qr-generator > :nth-child(1) { /* QRDataInput */
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .qr-generator > :nth-child(2) { /* QRPreview */
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .qr-generator > :nth-child(3) { /* QROptions */
+    grid-column: 1;
+    grid-row: 3;
   }
 }
 

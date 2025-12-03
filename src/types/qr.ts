@@ -1,5 +1,62 @@
 import type { DotType, CornerSquareType, CornerDotType, GradientType, ErrorCorrectionLevel } from 'qr-code-styling';
 
+// QR Content Template Types
+export type QRTemplateType = 'url' | 'vcard' | 'wifi' | 'email' | 'sms' | 'calendar' | 'location';
+
+export interface URLData {
+  url: string;
+}
+
+export interface VCardData {
+  firstName: string;
+  lastName: string;
+  organization: string;
+  title: string;
+  phone: string;
+  email: string;
+  website: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+}
+
+export interface WiFiData {
+  ssid: string;
+  password: string;
+  encryption: 'WPA' | 'WEP' | 'nopass';
+  hidden: boolean;
+}
+
+export interface EmailData {
+  email: string;
+  subject: string;
+  body: string;
+}
+
+export interface SMSData {
+  phone: string;
+  message: string;
+}
+
+export interface CalendarData {
+  title: string;
+  location: string;
+  description: string;
+  startDate: string; // ISO format
+  endDate: string; // ISO format
+  allDay: boolean;
+}
+
+export interface LocationData {
+  latitude: string;
+  longitude: string;
+  label: string;
+}
+
+export type QRTemplateData = URLData | VCardData | WiFiData | EmailData | SMSData | CalendarData | LocationData;
+
 export interface GradientConfig {
   enabled: boolean;
   type: GradientType;
@@ -9,6 +66,7 @@ export interface GradientConfig {
 
 export interface QROptions {
   data: string;
+  templateType: QRTemplateType;
   size: number;
   margin: number;
   // Error correction
@@ -31,9 +89,9 @@ export interface QROptions {
   imageSize: number; // 0.2 to 0.3 (20-30%)
   imageMargin: number;
 }
-
 export const defaultQROptions: QROptions = {
   data: 'https://example.com',
+  templateType: 'url',
   size: 300,
   margin: 10,
   errorCorrectionLevel: 'M',
@@ -57,6 +115,59 @@ export const defaultQROptions: QROptions = {
   image: '',
   imageSize: 0.25,
   imageMargin: 5,
+};
+
+// Default template data
+export const defaultURLData: URLData = {
+  url: 'https://example.com',
+};
+
+export const defaultVCardData: VCardData = {
+  firstName: '',
+  lastName: '',
+  organization: '',
+  title: '',
+  phone: '',
+  email: '',
+  website: '',
+  address: '',
+  city: '',
+  state: '',
+  zip: '',
+  country: '',
+};
+
+export const defaultWiFiData: WiFiData = {
+  ssid: '',
+  password: '',
+  encryption: 'WPA',
+  hidden: false,
+};
+
+export const defaultEmailData: EmailData = {
+  email: '',
+  subject: '',
+  body: '',
+};
+
+export const defaultSMSData: SMSData = {
+  phone: '',
+  message: '',
+};
+
+export const defaultCalendarData: CalendarData = {
+  title: '',
+  location: '',
+  description: '',
+  startDate: '',
+  endDate: '',
+  allDay: false,
+};
+
+export const defaultLocationData: LocationData = {
+  latitude: '',
+  longitude: '',
+  label: '',
 };
 
 export const dotTypes: DotType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded'];

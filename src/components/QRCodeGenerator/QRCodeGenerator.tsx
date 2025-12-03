@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import type { QROptions, GradientConfig, ColorPreset } from '../../types/qr';
+import type { QROptions, GradientConfig, ColorPreset, QRTemplateType } from '../../types/qr';
 import { defaultQROptions, STORAGE_KEY } from '../../types/qr';
+import QRDataInput from '../QRDataInput/QRDataInput';
 import QRPreview from '../QRPreview/QRPreview';
 import QROptionsPanel from '../QROptions/QROptions';
 import './QRCodeGenerator.css';
@@ -108,6 +109,16 @@ export default function QRCodeGenerator() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
 
+  // Update template type
+  const updateTemplateType = (type: QRTemplateType) => {
+    setOptions((prev) => ({ ...prev, templateType: type }));
+  };
+
+  // Update data from template forms
+  const updateData = (data: string) => {
+    setOptions((prev) => ({ ...prev, data }));
+  };
+
   // Update a single option
   const updateOption = <K extends keyof QROptions>(key: K, value: QROptions[K]) => {
     setOptions((prev) => {
@@ -201,6 +212,11 @@ export default function QRCodeGenerator() {
 
   return (
     <div className="qr-generator">
+      <QRDataInput
+        templateType={options.templateType}
+        onTemplateChange={updateTemplateType}
+        onDataChange={updateData}
+      />
       <QRPreview options={previewOptions} />
       <QROptionsPanel
         options={options}
