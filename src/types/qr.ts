@@ -1,7 +1,22 @@
 import type { DotType, CornerSquareType, CornerDotType, GradientType, ErrorCorrectionLevel } from 'qr-code-styling';
 
+// Template Categories
+export type TemplateCategory = 'all' | 'links' | 'contact' | 'social' | 'payment';
+
 // QR Content Template Types
-export type QRTemplateType = 'url' | 'vcard' | 'wifi' | 'email' | 'sms' | 'calendar' | 'location';
+export type QRTemplateType =
+  // Links
+  | 'url'
+  // Contact
+  | 'vcard' | 'email' | 'sms' | 'phone'
+  // Messaging
+  | 'whatsapp' | 'telegram'
+  // Social
+  | 'instagram' | 'twitter' | 'linkedin' | 'tiktok' | 'youtube' | 'facebook' | 'snapchat'
+  // Payment
+  | 'paypal' | 'bitcoin'
+  // Utilities
+  | 'wifi' | 'calendar' | 'location';
 
 export interface URLData {
   url: string;
@@ -55,7 +70,44 @@ export interface LocationData {
   label: string;
 }
 
-export type QRTemplateData = URLData | VCardData | WiFiData | EmailData | SMSData | CalendarData | LocationData;
+// Phone Call Data
+export interface PhoneData {
+  phone: string;
+}
+
+// WhatsApp Data
+export interface WhatsAppData {
+  phone: string;
+  message: string;
+}
+
+// Telegram Data
+export interface TelegramData {
+  username: string;
+}
+
+// Social Media Data (generic for all platforms)
+export interface SocialMediaData {
+  username: string;
+}
+
+// PayPal Data
+export interface PayPalData {
+  username: string;
+  amount?: string;
+  currency?: string;
+}
+
+// Bitcoin Data
+export interface BitcoinData {
+  address: string;
+  amount?: string;
+  label?: string;
+}
+
+export type QRTemplateData =
+  | URLData | VCardData | WiFiData | EmailData | SMSData | CalendarData | LocationData
+  | PhoneData | WhatsAppData | TelegramData | SocialMediaData | PayPalData | BitcoinData;
 
 export interface GradientConfig {
   enabled: boolean;
@@ -90,7 +142,7 @@ export interface QROptions {
   imageMargin: number;
 }
 export const defaultQROptions: QROptions = {
-  data: 'https://example.com',
+  data: '',
   templateType: 'url',
   size: 300,
   margin: 10,
@@ -119,7 +171,7 @@ export const defaultQROptions: QROptions = {
 
 // Default template data
 export const defaultURLData: URLData = {
-  url: 'https://example.com',
+  url: '',
 };
 
 export const defaultVCardData: VCardData = {
@@ -168,6 +220,78 @@ export const defaultLocationData: LocationData = {
   latitude: '',
   longitude: '',
   label: '',
+};
+
+export const defaultPhoneData: PhoneData = {
+  phone: '',
+};
+
+export const defaultWhatsAppData: WhatsAppData = {
+  phone: '',
+  message: '',
+};
+
+export const defaultTelegramData: TelegramData = {
+  username: '',
+};
+
+export const defaultSocialMediaData: SocialMediaData = {
+  username: '',
+};
+
+export const defaultPayPalData: PayPalData = {
+  username: '',
+  amount: '',
+  currency: 'EUR',
+};
+
+export const defaultBitcoinData: BitcoinData = {
+  address: '',
+  amount: '',
+  label: '',
+};
+
+// Template definition with categories
+export interface TemplateDefinition {
+  type: QRTemplateType;
+  label: string;
+  category: TemplateCategory;
+  description: string;
+}
+
+export const templateDefinitions: TemplateDefinition[] = [
+  // Links
+  { type: 'url', label: 'URL', category: 'links', description: 'Website or link' },
+  // Contact & Messaging
+  { type: 'vcard', label: 'vCard', category: 'contact', description: 'Contact card' },
+  { type: 'email', label: 'Email', category: 'contact', description: 'Email message' },
+  { type: 'sms', label: 'SMS', category: 'contact', description: 'Text message' },
+  { type: 'phone', label: 'Phone', category: 'contact', description: 'Phone call' },
+  { type: 'whatsapp', label: 'WhatsApp', category: 'contact', description: 'WhatsApp message' },
+  { type: 'telegram', label: 'Telegram', category: 'contact', description: 'Telegram profile' },
+  // Social
+  { type: 'instagram', label: 'Instagram', category: 'social', description: 'Instagram profile' },
+  { type: 'twitter', label: 'Twitter/X', category: 'social', description: 'Twitter profile' },
+  { type: 'linkedin', label: 'LinkedIn', category: 'social', description: 'LinkedIn profile' },
+  { type: 'tiktok', label: 'TikTok', category: 'social', description: 'TikTok profile' },
+  { type: 'youtube', label: 'YouTube', category: 'social', description: 'YouTube channel' },
+  { type: 'facebook', label: 'Facebook', category: 'social', description: 'Facebook page' },
+  { type: 'snapchat', label: 'Snapchat', category: 'social', description: 'Snapchat profile' },
+  // Payment
+  { type: 'paypal', label: 'PayPal', category: 'payment', description: 'PayPal payment' },
+  { type: 'bitcoin', label: 'Bitcoin', category: 'payment', description: 'Bitcoin address' },
+  // Utilities (shown in 'all' or could add 'utilities' category)
+  { type: 'wifi', label: 'WiFi', category: 'links', description: 'WiFi credentials' },
+  { type: 'calendar', label: 'Event', category: 'links', description: 'Calendar event' },
+  { type: 'location', label: 'Location', category: 'links', description: 'Geo location' },
+];
+
+export const categoryLabels: Record<TemplateCategory, string> = {
+  all: 'All',
+  links: 'Links',
+  contact: 'Contact & Messaging',
+  social: 'Social',
+  payment: 'Payment',
 };
 
 export const dotTypes: DotType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded'];

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type {
   QRTemplateType,
+  TemplateCategory,
   URLData,
   VCardData,
   WiFiData,
@@ -8,8 +9,19 @@ import type {
   SMSData,
   CalendarData,
   LocationData,
+  PhoneData,
+  WhatsAppData,
+  TelegramData,
+  SocialMediaData,
+  PayPalData,
+  BitcoinData,
   QRTemplateData
 } from '../../types/qr';
+import {
+  Link, Contact, Wifi, Mail, MessageSquare, Calendar, MapPin, Phone,
+  Instagram, Twitter, Linkedin, Youtube, Facebook,
+  MessageCircle, Send, DollarSign, Bitcoin, Video, ChevronDown, Ghost
+} from 'lucide-react';
 import {
   defaultURLData,
   defaultVCardData,
@@ -17,9 +29,16 @@ import {
   defaultEmailData,
   defaultSMSData,
   defaultCalendarData,
-  defaultLocationData
+  defaultLocationData,
+  defaultPhoneData,
+  defaultWhatsAppData,
+  defaultTelegramData,
+  defaultSocialMediaData,
+  defaultPayPalData,
+  defaultBitcoinData,
+  templateDefinitions,
+  categoryLabels
 } from '../../types/qr';
-import { Link, Contact, Wifi, Mail, MessageSquare, Calendar, MapPin } from 'lucide-react';
 import './QRDataInput.css';
 
 interface QRDataInputProps {
@@ -28,15 +47,31 @@ interface QRDataInputProps {
   onDataChange: (data: string) => void;
 }
 
-const templates = [
-  { type: 'url' as const, label: 'URL', icon: Link, description: 'Website or link' },
-  { type: 'vcard' as const, label: 'vCard', icon: Contact, description: 'Contact card' },
-  { type: 'wifi' as const, label: 'WiFi', icon: Wifi, description: 'Network credentials' },
-  { type: 'email' as const, label: 'Email', icon: Mail, description: 'Email message' },
-  { type: 'sms' as const, label: 'SMS', icon: MessageSquare, description: 'Text message' },
-  { type: 'calendar' as const, label: 'Event', icon: Calendar, description: 'Calendar event' },
-  { type: 'location' as const, label: 'Location', icon: MapPin, description: 'Geo coordinates' },
-];
+// Categories for dropdown grouping
+const displayCategories: TemplateCategory[] = ['links', 'contact', 'social', 'payment'];
+
+// Icon mapping for templates
+const templateIcons: Record<QRTemplateType, React.ElementType> = {
+  url: Link,
+  vcard: Contact,
+  wifi: Wifi,
+  email: Mail,
+  sms: MessageSquare,
+  calendar: Calendar,
+  location: MapPin,
+  phone: Phone,
+  whatsapp: MessageCircle,
+  telegram: Send,
+  instagram: Instagram,
+  twitter: Twitter,
+  linkedin: Linkedin,
+  tiktok: Video,
+  youtube: Youtube,
+  facebook: Facebook,
+  snapchat: Ghost,
+  paypal: DollarSign,
+  bitcoin: Bitcoin,
+};
 
 // Helper functions to convert template data to QR string
 const generateQRString = (type: QRTemplateType, data: QRTemplateData): string => {
@@ -82,6 +117,12 @@ const generateQRString = (type: QRTemplateType, data: QRTemplateData): string =>
       return `sms:${sms.phone}${sms.message ? `?body=${encodeURIComponent(sms.message)}` : ''}`;
     }
 
+    case 'phone': {
+      const phone = data as PhoneData;
+      if (!phone.phone) return '';
+      return `tel:${phone.phone}`;
+    }
+
     case 'calendar': {
       const cal = data as CalendarData;
       if (!cal.title) return '';
@@ -103,12 +144,89 @@ const generateQRString = (type: QRTemplateType, data: QRTemplateData): string =>
       return `geo:${loc.latitude},${loc.longitude}${loc.label ? `?q=${encodeURIComponent(loc.label)}` : ''}`;
     }
 
+    case 'whatsapp': {
+      const wa = data as WhatsAppData;
+      if (!wa.phone) return '';
+      const phone = wa.phone.replace(/[^0-9]/g, '');
+      return `https://wa.me/${phone}${wa.message ? `?text=${encodeURIComponent(wa.message)}` : ''}`;
+    }
+
+    case 'telegram': {
+      const tg = data as TelegramData;
+      if (!tg.username) return '';
+      return `https://t.me/${tg.username.replace('@', '')}`;
+    }
+
+    case 'instagram': {
+      const ig = data as SocialMediaData;
+      if (!ig.username) return '';
+      return `https://instagram.com/${ig.username.replace('@', '')}`;
+    }
+
+    case 'twitter': {
+      const tw = data as SocialMediaData;
+      if (!tw.username) return '';
+      return `https://twitter.com/${tw.username.replace('@', '')}`;
+    }
+
+    case 'linkedin': {
+      const li = data as SocialMediaData;
+      if (!li.username) return '';
+      return `https://linkedin.com/in/${li.username}`;
+    }
+
+    case 'tiktok': {
+      const tt = data as SocialMediaData;
+      if (!tt.username) return '';
+      return `https://tiktok.com/@${tt.username.replace('@', '')}`;
+    }
+
+    case 'youtube': {
+      const yt = data as SocialMediaData;
+      if (!yt.username) return '';
+      return `https://youtube.com/@${yt.username.replace('@', '')}`;
+    }
+
+    case 'facebook': {
+      const fb = data as SocialMediaData;
+      if (!fb.username) return '';
+      return `https://facebook.com/${fb.username}`;
+    }
+
+    case 'snapchat': {
+      const sc = data as SocialMediaData;
+      if (!sc.username) return '';
+      return `https://snapchat.com/add/${sc.username}`;
+    }
+
+    case 'paypal': {
+      const pp = data as PayPalData;
+      if (!pp.username) return '';
+      let url = `https://paypal.me/${pp.username}`;
+      if (pp.amount) {
+        url += `/${pp.amount}${pp.currency ? pp.currency : ''}`;
+      }
+      return url;
+    }
+
+    case 'bitcoin': {
+      const btc = data as BitcoinData;
+      if (!btc.address) return '';
+      let url = `bitcoin:${btc.address}`;
+      const params: string[] = [];
+      if (btc.amount) params.push(`amount=${btc.amount}`);
+      if (btc.label) params.push(`label=${encodeURIComponent(btc.label)}`);
+      if (params.length > 0) url += `?${params.join('&')}`;
+      return url;
+    }
+
     default:
       return '';
   }
 };
 
 export default function QRDataInput({ templateType, onTemplateChange, onDataChange }: QRDataInputProps) {
+  // Template data states
   const [urlData, setUrlData] = useState<URLData>(defaultURLData);
   const [vcardData, setVcardData] = useState<VCardData>(defaultVCardData);
   const [wifiData, setWifiData] = useState<WiFiData>(defaultWiFiData);
@@ -116,27 +234,52 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
   const [smsData, setSmsData] = useState<SMSData>(defaultSMSData);
   const [calendarData, setCalendarData] = useState<CalendarData>(defaultCalendarData);
   const [locationData, setLocationData] = useState<LocationData>(defaultLocationData);
+  const [phoneData, setPhoneData] = useState<PhoneData>(defaultPhoneData);
+  const [whatsappData, setWhatsappData] = useState<WhatsAppData>(defaultWhatsAppData);
+  const [telegramData, setTelegramData] = useState<TelegramData>(defaultTelegramData);
+  const [instagramData, setInstagramData] = useState<SocialMediaData>(defaultSocialMediaData);
+  const [twitterData, setTwitterData] = useState<SocialMediaData>(defaultSocialMediaData);
+  const [linkedinData, setLinkedinData] = useState<SocialMediaData>(defaultSocialMediaData);
+  const [tiktokData, setTiktokData] = useState<SocialMediaData>(defaultSocialMediaData);
+  const [youtubeData, setYoutubeData] = useState<SocialMediaData>(defaultSocialMediaData);
+  const [facebookData, setFacebookData] = useState<SocialMediaData>(defaultSocialMediaData);
+  const [snapchatData, setSnapchatData] = useState<SocialMediaData>(defaultSocialMediaData);
+  const [paypalData, setPaypalData] = useState<PayPalData>(defaultPayPalData);
+  const [bitcoinData, setBitcoinData] = useState<BitcoinData>(defaultBitcoinData);
 
   const updateData = (type: QRTemplateType, data: QRTemplateData) => {
     const qrString = generateQRString(type, data);
     onDataChange(qrString);
   };
 
+  const getDataForType = (type: QRTemplateType): QRTemplateData => {
+    switch (type) {
+      case 'url': return urlData;
+      case 'vcard': return vcardData;
+      case 'wifi': return wifiData;
+      case 'email': return emailData;
+      case 'sms': return smsData;
+      case 'calendar': return calendarData;
+      case 'location': return locationData;
+      case 'phone': return phoneData;
+      case 'whatsapp': return whatsappData;
+      case 'telegram': return telegramData;
+      case 'instagram': return instagramData;
+      case 'twitter': return twitterData;
+      case 'linkedin': return linkedinData;
+      case 'tiktok': return tiktokData;
+      case 'youtube': return youtubeData;
+      case 'facebook': return facebookData;
+      case 'snapchat': return snapchatData;
+      case 'paypal': return paypalData;
+      case 'bitcoin': return bitcoinData;
+      default: return urlData;
+    }
+  };
+
   const handleTemplateChange = (type: QRTemplateType) => {
     onTemplateChange(type);
-    // Generate QR string for the new template with current data
-    let data: QRTemplateData;
-    switch (type) {
-      case 'url': data = urlData; break;
-      case 'vcard': data = vcardData; break;
-      case 'wifi': data = wifiData; break;
-      case 'email': data = emailData; break;
-      case 'sms': data = smsData; break;
-      case 'calendar': data = calendarData; break;
-      case 'location': data = locationData; break;
-      default: data = urlData;
-    }
-    updateData(type, data);
+    updateData(type, getDataForType(type));
   };
 
   const renderForm = () => {
@@ -473,6 +616,26 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
           </div>
         );
 
+      case 'phone':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="phoneNumber">Phone Number *</label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                value={phoneData.phone}
+                onChange={(e) => {
+                  const newData = { ...phoneData, phone: e.target.value };
+                  setPhoneData(newData);
+                  updateData('phone', newData);
+                }}
+                placeholder="+1234567890"
+              />
+            </div>
+          </div>
+        );
+
       case 'calendar':
         return (
           <div className="template-form">
@@ -607,27 +770,379 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
           </div>
         );
 
+      case 'whatsapp':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="waPhone">Phone Number *</label>
+              <input
+                type="tel"
+                id="waPhone"
+                value={whatsappData.phone}
+                onChange={(e) => {
+                  const newData = { ...whatsappData, phone: e.target.value };
+                  setWhatsappData(newData);
+                  updateData('whatsapp', newData);
+                }}
+                placeholder="+1234567890 (with country code)"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="waMessage">Pre-filled Message</label>
+              <textarea
+                id="waMessage"
+                value={whatsappData.message}
+                onChange={(e) => {
+                  const newData = { ...whatsappData, message: e.target.value };
+                  setWhatsappData(newData);
+                  updateData('whatsapp', newData);
+                }}
+                rows={3}
+                placeholder="Hello! I'd like to..."
+              />
+            </div>
+          </div>
+        );
+
+      case 'telegram':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="tgUsername">Username *</label>
+              <input
+                type="text"
+                id="tgUsername"
+                value={telegramData.username}
+                onChange={(e) => {
+                  const newData = { ...telegramData, username: e.target.value };
+                  setTelegramData(newData);
+                  updateData('telegram', newData);
+                }}
+                placeholder="@username or username"
+              />
+            </div>
+          </div>
+        );
+
+      case 'instagram':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="igUsername">Username *</label>
+              <input
+                type="text"
+                id="igUsername"
+                value={instagramData.username}
+                onChange={(e) => {
+                  const newData = { username: e.target.value };
+                  setInstagramData(newData);
+                  updateData('instagram', newData);
+                }}
+                placeholder="@username or username"
+              />
+            </div>
+          </div>
+        );
+
+      case 'twitter':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="twUsername">Username *</label>
+              <input
+                type="text"
+                id="twUsername"
+                value={twitterData.username}
+                onChange={(e) => {
+                  const newData = { username: e.target.value };
+                  setTwitterData(newData);
+                  updateData('twitter', newData);
+                }}
+                placeholder="@username or username"
+              />
+            </div>
+          </div>
+        );
+
+      case 'linkedin':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="liUsername">Profile ID *</label>
+              <input
+                type="text"
+                id="liUsername"
+                value={linkedinData.username}
+                onChange={(e) => {
+                  const newData = { username: e.target.value };
+                  setLinkedinData(newData);
+                  updateData('linkedin', newData);
+                }}
+                placeholder="john-doe-123456"
+              />
+            </div>
+          </div>
+        );
+
+      case 'tiktok':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="ttUsername">Username *</label>
+              <input
+                type="text"
+                id="ttUsername"
+                value={tiktokData.username}
+                onChange={(e) => {
+                  const newData = { username: e.target.value };
+                  setTiktokData(newData);
+                  updateData('tiktok', newData);
+                }}
+                placeholder="@username or username"
+              />
+            </div>
+          </div>
+        );
+
+      case 'youtube':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="ytUsername">Channel Handle *</label>
+              <input
+                type="text"
+                id="ytUsername"
+                value={youtubeData.username}
+                onChange={(e) => {
+                  const newData = { username: e.target.value };
+                  setYoutubeData(newData);
+                  updateData('youtube', newData);
+                }}
+                placeholder="@channelname"
+              />
+            </div>
+          </div>
+        );
+
+      case 'facebook':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="fbUsername">Page/Profile Name *</label>
+              <input
+                type="text"
+                id="fbUsername"
+                value={facebookData.username}
+                onChange={(e) => {
+                  const newData = { username: e.target.value };
+                  setFacebookData(newData);
+                  updateData('facebook', newData);
+                }}
+                placeholder="pagename or profile.id"
+              />
+            </div>
+          </div>
+        );
+
+      case 'snapchat':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="scUsername">Username *</label>
+              <input
+                type="text"
+                id="scUsername"
+                value={snapchatData.username}
+                onChange={(e) => {
+                  const newData = { username: e.target.value };
+                  setSnapchatData(newData);
+                  updateData('snapchat', newData);
+                }}
+                placeholder="username"
+              />
+            </div>
+          </div>
+        );
+
+      case 'paypal':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="ppUsername">PayPal.me Username *</label>
+              <input
+                type="text"
+                id="ppUsername"
+                value={paypalData.username}
+                onChange={(e) => {
+                  const newData = { ...paypalData, username: e.target.value };
+                  setPaypalData(newData);
+                  updateData('paypal', newData);
+                }}
+                placeholder="yourusername"
+              />
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="ppAmount">Amount (optional)</label>
+                <input
+                  type="text"
+                  id="ppAmount"
+                  value={paypalData.amount || ''}
+                  onChange={(e) => {
+                    const newData = { ...paypalData, amount: e.target.value };
+                    setPaypalData(newData);
+                    updateData('paypal', newData);
+                  }}
+                  placeholder="10.00"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="ppCurrency">Currency</label>
+                <select
+                  id="ppCurrency"
+                  value={paypalData.currency || 'USD'}
+                  onChange={(e) => {
+                    const newData = { ...paypalData, currency: e.target.value };
+                    setPaypalData(newData);
+                    updateData('paypal', newData);
+                  }}
+                >
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="GBP">GBP</option>
+                  <option value="CAD">CAD</option>
+                  <option value="AUD">AUD</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'bitcoin':
+        return (
+          <div className="template-form">
+            <div className="form-group">
+              <label htmlFor="btcAddress">Bitcoin Address *</label>
+              <input
+                type="text"
+                id="btcAddress"
+                value={bitcoinData.address}
+                onChange={(e) => {
+                  const newData = { ...bitcoinData, address: e.target.value };
+                  setBitcoinData(newData);
+                  updateData('bitcoin', newData);
+                }}
+                placeholder="bc1q..."
+              />
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="btcAmount">Amount (BTC)</label>
+                <input
+                  type="text"
+                  id="btcAmount"
+                  value={bitcoinData.amount || ''}
+                  onChange={(e) => {
+                    const newData = { ...bitcoinData, amount: e.target.value };
+                    setBitcoinData(newData);
+                    updateData('bitcoin', newData);
+                  }}
+                  placeholder="0.001"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="btcLabel">Label</label>
+                <input
+                  type="text"
+                  id="btcLabel"
+                  value={bitcoinData.label || ''}
+                  onChange={(e) => {
+                    const newData = { ...bitcoinData, label: e.target.value };
+                    setBitcoinData(newData);
+                    updateData('bitcoin', newData);
+                  }}
+                  placeholder="Donation"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
   };
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const currentTemplate = templateDefinitions.find(t => t.type === templateType);
+  const CurrentIcon = templateIcons[templateType];
+
   return (
     <div className="qr-data-input">
       <h2>QR Content</h2>
 
-      <div className="template-selector">
-        {templates.map(({ type, label, icon: Icon, description }) => (
-          <button
-            key={type}
-            className={`template-btn ${templateType === type ? 'active' : ''}`}
-            onClick={() => handleTemplateChange(type)}
-            title={description}
-          >
-            <Icon size={20} />
-            <span>{label}</span>
-          </button>
-        ))}
+      {/* Custom Template Dropdown with Icons */}
+      <div className="template-dropdown-container" ref={dropdownRef}>
+        <label>Template Type</label>
+        <button
+          type="button"
+          className={`template-dropdown-trigger ${isDropdownOpen ? 'open' : ''}`}
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          aria-haspopup="listbox"
+          aria-expanded={isDropdownOpen}
+        >
+          <span className="template-dropdown-selected">
+            <CurrentIcon size={18} />
+            <span>{currentTemplate?.label || 'Select Template'}</span>
+          </span>
+          <ChevronDown size={18} className={`dropdown-chevron ${isDropdownOpen ? 'rotated' : ''}`} />
+        </button>
+
+        {isDropdownOpen && (
+          <div className="template-dropdown-menu" role="listbox">
+            {displayCategories.map((category) => {
+              const categoryTemplates = templateDefinitions.filter(t => t.category === category);
+              if (categoryTemplates.length === 0) return null;
+              return (
+                <div key={category} className="template-dropdown-group">
+                  <div className="template-dropdown-group-label">{categoryLabels[category]}</div>
+                  {categoryTemplates.map(({ type, label }) => {
+                    const Icon = templateIcons[type];
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        className={`template-dropdown-item ${type === templateType ? 'selected' : ''}`}
+                        onClick={() => {
+                          handleTemplateChange(type);
+                          setIsDropdownOpen(false);
+                        }}
+                        role="option"
+                        aria-selected={type === templateType}
+                      >
+                        <Icon size={16} />
+                        <span>{label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {renderForm()}
