@@ -15,10 +15,12 @@
   },
   "dependencies": {
     "jspdf": "^3.0.4",
+    "libphonenumber-js": "^1.12.31",
     "lucide-react": "^0.555.0",
     "qr-code-styling": "^1.9.2",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-select": "^5.10.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

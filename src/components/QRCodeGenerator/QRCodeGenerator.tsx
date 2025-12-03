@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import type { QROptions, GradientConfig, ColorPreset } from '../../types/qr';
+import type { QROptions, GradientConfig, ColorPreset, QRTemplateType } from '../../types/qr';
 import { defaultQROptions, STORAGE_KEY } from '../../types/qr';
+import QRDataInput from '../QRDataInput/QRDataInput';
 import QRPreview from '../QRPreview/QRPreview';
 import QROptionsPanel from '../QROptions/QROptions';
 import './QRCodeGenerator.css';
@@ -13,6 +14,15 @@ const loadSavedOptions = (): QROptions => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
+      // Migrate old imageSize if outside new range (0.1-0.3)
+      if (parsed.imageSize !== undefined) {
+        // If it was in pixels (>1), convert back to percentage
+        if (parsed.imageSize > 1) {
+          parsed.imageSize = parsed.imageSize / 300;
+        }
+        // Clamp to valid range (10%-30%)
+        parsed.imageSize = Math.max(0.1, Math.min(0.3, parsed.imageSize));
+      }
       // Merge with defaults to ensure new fields are included
       return { ...defaultQROptions, ...parsed };
     }
@@ -108,6 +118,16 @@ export default function QRCodeGenerator() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
 
+  // Update template type
+  const updateTemplateType = (type: QRTemplateType) => {
+    setOptions((prev) => ({ ...prev, templateType: type }));
+  };
+
+  // Update data from template forms
+  const updateData = (data: string) => {
+    setOptions((prev) => ({ ...prev, data }));
+  };
+
   // Update a single option
   const updateOption = <K extends keyof QROptions>(key: K, value: QROptions[K]) => {
     setOptions((prev) => {
@@ -201,6 +221,11 @@ export default function QRCodeGenerator() {
 
   return (
     <div className="qr-generator">
+      <QRDataInput
+        templateType={options.templateType}
+        onTemplateChange={updateTemplateType}
+        onDataChange={updateData}
+      />
       <QRPreview options={previewOptions} />
       <QROptionsPanel
         options={options}
