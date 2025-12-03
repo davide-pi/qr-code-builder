@@ -62,13 +62,13 @@ export default function QRPreview({ options }: QRPreviewProps) {
       imageOptions: {
         crossOrigin: 'anonymous',
         margin: options.imageMargin,
-        imageSize: options.imageSize,
+        // Convert percentage (0.1-0.3) to ratio (0.33-1.0)
+        // 10% -> 0.33, 30% -> 1.0
+        imageSize: (options.imageSize / 0.3),
       },
+      // Only include image if it exists
+      image: options.image || undefined,
     };
-
-    if (options.image) {
-      qrOptions.image = options.image;
-    }
 
     return qrOptions;
   }, [options]);
@@ -142,6 +142,19 @@ export default function QRPreview({ options }: QRPreviewProps) {
       }
     }
   }, [buildQROptions, createQRCode, options.data, options.errorCorrectionLevel]);
+
+  // Recreate QR code when image or image size changes (update doesn't handle these well)
+  useEffect(() => {
+    if (!qrCodeRef.current) return;
+
+    try {
+      const qrOptions = buildQROptions();
+      createQRCode(qrOptions);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to update QR code image:', err);
+    }
+  }, [buildQROptions, createQRCode, options.image, options.imageSize]);
 
   // Copy to clipboard
   const copyToClipboard = async () => {

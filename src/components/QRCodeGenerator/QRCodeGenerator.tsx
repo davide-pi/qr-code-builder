@@ -14,6 +14,15 @@ const loadSavedOptions = (): QROptions => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
+      // Migrate old imageSize if outside new range (0.1-0.3)
+      if (parsed.imageSize !== undefined) {
+        // If it was in pixels (>1), convert back to percentage
+        if (parsed.imageSize > 1) {
+          parsed.imageSize = parsed.imageSize / 300;
+        }
+        // Clamp to valid range (10%-30%)
+        parsed.imageSize = Math.max(0.1, Math.min(0.3, parsed.imageSize));
+      }
       // Merge with defaults to ensure new fields are included
       return { ...defaultQROptions, ...parsed };
     }

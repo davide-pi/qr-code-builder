@@ -1,4 +1,5 @@
 import type { DotType, CornerSquareType, CornerDotType, GradientType, ErrorCorrectionLevel } from 'qr-code-styling';
+import { getCountries, getCountryCallingCode, type CountryCode } from 'libphonenumber-js';
 
 // Template Categories
 export type TemplateCategory = 'all' | 'links' | 'contact' | 'social' | 'payment';
@@ -51,6 +52,7 @@ export interface EmailData {
 }
 
 export interface SMSData {
+  countryCode: string;
   phone: string;
   message: string;
 }
@@ -72,11 +74,13 @@ export interface LocationData {
 
 // Phone Call Data
 export interface PhoneData {
+  countryCode: string;
   phone: string;
 }
 
 // WhatsApp Data
 export interface WhatsAppData {
+  countryCode: string;
   phone: string;
   message: string;
 }
@@ -84,6 +88,7 @@ export interface WhatsAppData {
 // Telegram Data
 export interface TelegramData {
   username: string;
+  message: string;
 }
 
 // Social Media Data (generic for all platforms)
@@ -138,7 +143,7 @@ export interface QROptions {
   transparentBackground: boolean;
   // Image options
   image: string;
-  imageSize: number; // 0.2 to 0.3 (20-30%)
+  imageSize: number;
   imageMargin: number;
 }
 export const defaultQROptions: QROptions = {
@@ -165,7 +170,7 @@ export const defaultQROptions: QROptions = {
   backgroundColor: '#ffffff',
   transparentBackground: false,
   image: '',
-  imageSize: 0.25,
+  imageSize: 0.2,
   imageMargin: 5,
 };
 
@@ -203,18 +208,34 @@ export const defaultEmailData: EmailData = {
 };
 
 export const defaultSMSData: SMSData = {
+  countryCode: '+39',
   phone: '',
   message: '',
 };
 
-export const defaultCalendarData: CalendarData = {
+// Helper to get current datetime in format for datetime-local input
+const getCurrentDateTime = (): string => {
+  const now = new Date();
+  // Format: YYYY-MM-DDTHH:MM
+  return now.toISOString().slice(0, 16);
+};
+
+// Helper to get datetime 1 hour from now
+const getOneHourLater = (): string => {
+  const later = new Date(Date.now() + 60 * 60 * 1000);
+  return later.toISOString().slice(0, 16);
+};
+
+export const getDefaultCalendarData = (): CalendarData => ({
   title: '',
   location: '',
   description: '',
-  startDate: '',
-  endDate: '',
+  startDate: getCurrentDateTime(),
+  endDate: getOneHourLater(),
   allDay: false,
-};
+});
+
+export const defaultCalendarData: CalendarData = getDefaultCalendarData();
 
 export const defaultLocationData: LocationData = {
   latitude: '',
@@ -223,16 +244,19 @@ export const defaultLocationData: LocationData = {
 };
 
 export const defaultPhoneData: PhoneData = {
+  countryCode: '+39',
   phone: '',
 };
 
 export const defaultWhatsAppData: WhatsAppData = {
+  countryCode: '+39',
   phone: '',
   message: '',
 };
 
 export const defaultTelegramData: TelegramData = {
   username: '',
+  message: '',
 };
 
 export const defaultSocialMediaData: SocialMediaData = {
@@ -303,6 +327,31 @@ export const errorCorrectionLevels: { value: ErrorCorrectionLevel; label: string
   { value: 'M', label: 'Medium (M)', description: '~15% damage recovery. Good balance of size and reliability.' },
   { value: 'Q', label: 'Quartile (Q)', description: '~25% damage recovery. Good for moderate damage resistance.' },
   { value: 'H', label: 'High (H)', description: '~30% damage recovery. Best when using center logo.' },
+];
+
+// Common country codes for phone numbers (generated from libphonenumber-js)
+const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
+
+// Priority countries to show at the top of the list
+const priorityCountries: CountryCode[] = ['IT', 'US', 'GB', 'DE', 'FR', 'ES'];
+
+const allCountryCodes = getCountries()
+  .map((countryCode) => ({
+    countryCode,
+    code: `+${getCountryCallingCode(countryCode)}`,
+    country: countryNames.of(countryCode) || countryCode,
+  }))
+  .sort((a, b) => a.country.localeCompare(b.country));
+
+// Put priority countries at the top, then the rest alphabetically
+export const countryCodes: { code: string; country: string }[] = [
+  ...priorityCountries
+    .map((cc) => allCountryCodes.find((c) => c.countryCode === cc)!)
+    .filter(Boolean)
+    .map(({ code, country }) => ({ code, country })),
+  ...allCountryCodes
+    .filter((c) => !priorityCountries.includes(c.countryCode))
+    .map(({ code, country }) => ({ code, country })),
 ];
 
 // Local storage key

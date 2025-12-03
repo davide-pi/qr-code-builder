@@ -1,0 +1,89 @@
+/* Country Code Select - react-select styling */
+
+/* Control (the main input container) */
+.country-select__control {
+  background-color: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  border-radius: 6px !important;
+  min-height: 38px !important;
+  box-shadow: none !important;
+}
+
+.country-select__control:hover {
+  border-color: var(--primary) !important;
+}
+
+.country-select__control--is-focused {
+  border-color: var(--primary) !important;
+}
+
+/* Dropdown menu */
+.country-select__menu {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  z-index: 100 !important;
+}
+
+.country-select__menu-list {
+  padding: 4px !important;
+  max-height: 200px !important;
+}
+
+/* Options */
+.country-select__option {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 0.875rem !important;
+  padding: 8px 12px !important;
+}
+
+.country-select__option:hover,
+.country-select__option--is-focused {
+  background-color: var(--hover-bg) !important;
+}
+
+.country-select__option--is-selected {
+  background-color: var(--primary) !important;
+  color: white !important;
+}
+
+.country-select__option:active {
+  background-color: var(--primary) !important;
+}
+
+/* Selected value */
+.country-select__single-value {
+  color: var(--text-primary) !important;
+  font-size: 0.875rem !important;
+}
+
+/* Input text */
+.country-select__input-container {
+  color: var(--text-primary) !important;
+  font-size: 0.875rem !important;
+}
+
+/* Placeholder */
+.country-select__placeholder {
+  color: var(--text-muted) !important;
+  font-size: 0.875rem !important;
+}
+
+/* Dropdown indicator (arrow) */
+.country-select__dropdown-indicator {
+  color: var(--text-muted) !important;
+  padding: 6px !important;
+}
+
+.country-select__dropdown-indicator:hover {
+  color: var(--text-primary) !important;
+}
+
+/* Hide the separator between value and dropdown indicator */
+.country-select__indicator-separator {
+  display: none !important;
+}

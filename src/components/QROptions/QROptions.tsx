@@ -471,7 +471,7 @@ export default function QROptions({
               <input
                 type="range"
                 id="imageSize"
-                min="0.2"
+                min="0.1"
                 max="0.3"
                 step="0.01"
                 value={options.imageSize}
@@ -485,7 +485,7 @@ export default function QROptions({
                 type="range"
                 id="imageMargin"
                 min="0"
-                max="20"
+                max="5"
                 value={options.imageMargin}
                 onChange={(e) => onUpdateOption('imageMargin', Number(e.target.value))}
               />

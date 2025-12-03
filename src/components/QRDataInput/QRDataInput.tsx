@@ -28,7 +28,7 @@ import {
   defaultWiFiData,
   defaultEmailData,
   defaultSMSData,
-  defaultCalendarData,
+  getDefaultCalendarData,
   defaultLocationData,
   defaultPhoneData,
   defaultWhatsAppData,
@@ -37,8 +37,9 @@ import {
   defaultPayPalData,
   defaultBitcoinData,
   templateDefinitions,
-  categoryLabels
+  categoryLabels,
 } from '../../types/qr';
+import CountryCodeSelect from '../CountryCodeSelect/CountryCodeSelect';
 import './QRDataInput.css';
 
 interface QRDataInputProps {
@@ -114,28 +115,68 @@ const generateQRString = (type: QRTemplateType, data: QRTemplateData): string =>
     case 'sms': {
       const sms = data as SMSData;
       if (!sms.phone) return '';
-      return `sms:${sms.phone}${sms.message ? `?body=${encodeURIComponent(sms.message)}` : ''}`;
+      const fullPhone = `${sms.countryCode}${sms.phone.replace(/[^0-9]/g, '')}`;
+      return `sms:${fullPhone}${sms.message ? `?body=${encodeURIComponent(sms.message)}` : ''}`;
     }
 
     case 'phone': {
       const phone = data as PhoneData;
       if (!phone.phone) return '';
-      return `tel:${phone.phone}`;
+      const fullPhone = `${phone.countryCode}${phone.phone.replace(/[^0-9]/g, '')}`;
+      return `tel:${fullPhone}`;
     }
 
     case 'calendar': {
       const cal = data as CalendarData;
       if (!cal.title) return '';
-      const formatDate = (date: string) => date.replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-      return [
+
+      // Format datetime-local (YYYY-MM-DDTHH:MM) to iCalendar format (YYYYMMDDTHHMMSS)
+      const formatDateTime = (date: string) => {
+        if (!date) return '';
+        // Remove dashes, colons, and add seconds
+        return date.replace(/-/g, '').replace('T', 'T').replace(':', '') + '00';
+      };
+
+      // Format date only (YYYY-MM-DD) to iCalendar date format (YYYYMMDD)
+      const formatDateOnly = (date: string) => {
+        if (!date) return '';
+        // Extract just the date part and remove dashes
+        return date.split('T')[0].replace(/-/g, '');
+      };
+
+      // For all-day events, DTEND is exclusive, so add 1 day to end date
+      const getNextDay = (date: string) => {
+        if (!date) return '';
+        const dateOnly = date.split('T')[0];
+        const nextDay = new Date(dateOnly);
+        nextDay.setDate(nextDay.getDate() + 1);
+        return nextDay.toISOString().split('T')[0].replace(/-/g, '');
+      };
+
+      const lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
         'BEGIN:VEVENT',
         `SUMMARY:${cal.title}`,
-        cal.location ? `LOCATION:${cal.location}` : '',
-        cal.description ? `DESCRIPTION:${cal.description}` : '',
-        cal.startDate ? `DTSTART:${formatDate(cal.startDate)}` : '',
-        cal.endDate ? `DTEND:${formatDate(cal.endDate)}` : '',
-        'END:VEVENT',
-      ].filter(line => line).join('\n');
+      ];
+
+      if (cal.location) lines.push(`LOCATION:${cal.location}`);
+      if (cal.description) lines.push(`DESCRIPTION:${cal.description}`);
+
+      if (cal.allDay) {
+        // All-day event uses VALUE=DATE format
+        // DTEND is exclusive in iCalendar, so add 1 day
+        if (cal.startDate) lines.push(`DTSTART;VALUE=DATE:${formatDateOnly(cal.startDate)}`);
+        if (cal.endDate) lines.push(`DTEND;VALUE=DATE:${getNextDay(cal.endDate)}`);
+      } else {
+        // Timed event uses full datetime
+        if (cal.startDate) lines.push(`DTSTART:${formatDateTime(cal.startDate)}`);
+        if (cal.endDate) lines.push(`DTEND:${formatDateTime(cal.endDate)}`);
+      }
+
+      lines.push('END:VEVENT', 'END:VCALENDAR');
+
+      return lines.join('\n');
     }
 
     case 'location': {
@@ -147,14 +188,20 @@ const generateQRString = (type: QRTemplateType, data: QRTemplateData): string =>
     case 'whatsapp': {
       const wa = data as WhatsAppData;
       if (!wa.phone) return '';
-      const phone = wa.phone.replace(/[^0-9]/g, '');
-      return `https://wa.me/${phone}${wa.message ? `?text=${encodeURIComponent(wa.message)}` : ''}`;
+      // Combine country code and phone, remove all non-digits
+      const fullPhone = `${wa.countryCode}${wa.phone}`.replace(/[^0-9]/g, '');
+      return `https://wa.me/${fullPhone}${wa.message ? `?text=${encodeURIComponent(wa.message)}` : ''}`;
     }
 
     case 'telegram': {
       const tg = data as TelegramData;
       if (!tg.username) return '';
-      return `https://t.me/${tg.username.replace('@', '')}`;
+      const username = tg.username.replace('@', '');
+      // Use t.me link with ?text parameter for prefilled message
+      if (tg.message) {
+        return `https://t.me/${username}?text=${encodeURIComponent(tg.message)}`;
+      }
+      return `https://t.me/${username}`;
     }
 
     case 'instagram': {
@@ -232,7 +279,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
   const [wifiData, setWifiData] = useState<WiFiData>(defaultWiFiData);
   const [emailData, setEmailData] = useState<EmailData>(defaultEmailData);
   const [smsData, setSmsData] = useState<SMSData>(defaultSMSData);
-  const [calendarData, setCalendarData] = useState<CalendarData>(defaultCalendarData);
+  const [calendarData, setCalendarData] = useState<CalendarData>(getDefaultCalendarData);
   const [locationData, setLocationData] = useState<LocationData>(defaultLocationData);
   const [phoneData, setPhoneData] = useState<PhoneData>(defaultPhoneData);
   const [whatsappData, setWhatsappData] = useState<WhatsAppData>(defaultWhatsAppData);
@@ -587,18 +634,31 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="smsPhone">Phone Number *</label>
-              <input
-                type="tel"
-                id="smsPhone"
-                value={smsData.phone}
-                onChange={(e) => {
-                  const newData = { ...smsData, phone: e.target.value };
-                  setSmsData(newData);
-                  updateData('sms', newData);
-                }}
-                placeholder="+1234567890"
-              />
+              <label>Phone Number *</label>
+              <div className="phone-input-group">
+                <div className="country-code-select-wrapper">
+                  <CountryCodeSelect
+                    value={smsData.countryCode}
+                    onChange={(value) => {
+                      const newData = { ...smsData, countryCode: value };
+                      setSmsData(newData);
+                      updateData('sms', newData);
+                    }}
+                  />
+                </div>
+                <input
+                  type="tel"
+                  id="smsPhone"
+                  className="phone-number-input"
+                  value={smsData.phone}
+                  onChange={(e) => {
+                    const newData = { ...smsData, phone: e.target.value };
+                    setSmsData(newData);
+                    updateData('sms', newData);
+                  }}
+                  placeholder="123456789"
+                />
+              </div>
             </div>
             <div className="form-group">
               <label htmlFor="message">Message</label>
@@ -620,18 +680,31 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="phoneNumber">Phone Number *</label>
-              <input
-                type="tel"
-                id="phoneNumber"
-                value={phoneData.phone}
-                onChange={(e) => {
-                  const newData = { ...phoneData, phone: e.target.value };
-                  setPhoneData(newData);
-                  updateData('phone', newData);
-                }}
-                placeholder="+1234567890"
-              />
+              <label>Phone Number *</label>
+              <div className="phone-input-group">
+                <div className="country-code-select-wrapper">
+                  <CountryCodeSelect
+                    value={phoneData.countryCode}
+                    onChange={(value) => {
+                      const newData = { ...phoneData, countryCode: value };
+                      setPhoneData(newData);
+                      updateData('phone', newData);
+                    }}
+                  />
+                </div>
+                <input
+                  type="tel"
+                  id="phoneNumber"
+                  className="phone-number-input"
+                  value={phoneData.phone}
+                  onChange={(e) => {
+                    const newData = { ...phoneData, phone: e.target.value };
+                    setPhoneData(newData);
+                    updateData('phone', newData);
+                  }}
+                  placeholder="123456789"
+                />
+              </div>
             </div>
           </div>
         );
@@ -680,32 +753,6 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
               />
             </div>
             <div className="form-group">
-              <label htmlFor="startDate">Start Date & Time</label>
-              <input
-                type="datetime-local"
-                id="startDate"
-                value={calendarData.startDate}
-                onChange={(e) => {
-                  const newData = { ...calendarData, startDate: e.target.value };
-                  setCalendarData(newData);
-                  updateData('calendar', newData);
-                }}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="endDate">End Date & Time</label>
-              <input
-                type="datetime-local"
-                id="endDate"
-                value={calendarData.endDate}
-                onChange={(e) => {
-                  const newData = { ...calendarData, endDate: e.target.value };
-                  setCalendarData(newData);
-                  updateData('calendar', newData);
-                }}
-              />
-            </div>
-            <div className="form-group">
               <label className="checkbox-label">
                 <input
                   type="checkbox"
@@ -719,6 +766,69 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                 All Day Event
               </label>
             </div>
+            {calendarData.allDay ? (
+              <>
+                <div className="form-group">
+                  <label htmlFor="startDateOnly">Start Date</label>
+                  <input
+                    type="date"
+                    id="startDateOnly"
+                    max="9999-12-31"
+                    value={calendarData.startDate.split('T')[0] || ''}
+                    onChange={(e) => {
+                      const newData = { ...calendarData, startDate: e.target.value };
+                      setCalendarData(newData);
+                      updateData('calendar', newData);
+                    }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="endDateOnly">End Date</label>
+                  <input
+                    type="date"
+                    id="endDateOnly"
+                    max="9999-12-31"
+                    value={calendarData.endDate.split('T')[0] || ''}
+                    onChange={(e) => {
+                      const newData = { ...calendarData, endDate: e.target.value };
+                      setCalendarData(newData);
+                      updateData('calendar', newData);
+                    }}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="form-group">
+                  <label htmlFor="startDate">Start Date & Time</label>
+                  <input
+                    type="datetime-local"
+                    id="startDate"
+                    max="9999-12-31T23:59"
+                    value={calendarData.startDate}
+                    onChange={(e) => {
+                      const newData = { ...calendarData, startDate: e.target.value };
+                      setCalendarData(newData);
+                      updateData('calendar', newData);
+                    }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="endDate">End Date & Time</label>
+                  <input
+                    type="datetime-local"
+                    id="endDate"
+                    max="9999-12-31T23:59"
+                    value={calendarData.endDate}
+                    onChange={(e) => {
+                      const newData = { ...calendarData, endDate: e.target.value };
+                      setCalendarData(newData);
+                      updateData('calendar', newData);
+                    }}
+                  />
+                </div>
+              </>
+            )}
           </div>
         );
 
@@ -774,18 +884,31 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="waPhone">Phone Number *</label>
-              <input
-                type="tel"
-                id="waPhone"
-                value={whatsappData.phone}
-                onChange={(e) => {
-                  const newData = { ...whatsappData, phone: e.target.value };
-                  setWhatsappData(newData);
-                  updateData('whatsapp', newData);
-                }}
-                placeholder="+1234567890 (with country code)"
-              />
+              <label>Phone Number *</label>
+              <div className="phone-input-group">
+                <div className="country-code-select-wrapper">
+                  <CountryCodeSelect
+                    value={whatsappData.countryCode}
+                    onChange={(value) => {
+                      const newData = { ...whatsappData, countryCode: value };
+                      setWhatsappData(newData);
+                      updateData('whatsapp', newData);
+                    }}
+                  />
+                </div>
+                <input
+                  type="tel"
+                  id="waPhone"
+                  className="phone-number-input"
+                  value={whatsappData.phone}
+                  onChange={(e) => {
+                    const newData = { ...whatsappData, phone: e.target.value };
+                    setWhatsappData(newData);
+                    updateData('whatsapp', newData);
+                  }}
+                  placeholder="123456789"
+                />
+              </div>
             </div>
             <div className="form-group">
               <label htmlFor="waMessage">Pre-filled Message</label>
@@ -819,6 +942,20 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   updateData('telegram', newData);
                 }}
                 placeholder="@username or username"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="tgMessage">Prefilled Message</label>
+              <textarea
+                id="tgMessage"
+                value={telegramData.message}
+                onChange={(e) => {
+                  const newData = { ...telegramData, message: e.target.value };
+                  setTelegramData(newData);
+                  updateData('telegram', newData);
+                }}
+                placeholder="Hi! I scanned your QR code..."
+                rows={3}
               />
             </div>
           </div>
