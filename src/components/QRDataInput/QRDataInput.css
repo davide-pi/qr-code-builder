@@ -1,7 +1,7 @@
 .qr-data-input {
   background: var(--card-bg);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
@@ -11,9 +11,11 @@
 }
 
 .qr-data-input h2 {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  margin: 0;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
   color: var(--text-primary);
 }
 
@@ -300,15 +302,16 @@
 @media (max-width: 768px) {
   .qr-data-input {
     padding: 1rem;
+    overflow: visible;
+  }
+
+  .template-dropdown-menu {
+    max-height: 280px;
   }
 
   .template-dropdown-trigger {
     font-size: 0.875rem;
     padding: 0.625rem;
-  }
-
-  .template-dropdown-menu {
-    max-height: 280px;
   }
 
   .template-dropdown-item {
