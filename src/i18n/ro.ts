@@ -139,8 +139,8 @@ export const ro: Translations = {
       startColor: 'Început',
       endColor: 'Sfârșit',
       dotColor: 'Culoare Puncte',
-      cornerSquare: 'Pătrat Colț',
-      cornerDot: 'Punct Colț',
+      cornerSquare: 'Pătratul colțului',
+      cornerDot: 'Punctul colțului',
     },
     background: {
       transparent: 'Fundal Transparent',
@@ -158,7 +158,7 @@ export const ro: Translations = {
   // QR Preview
   qrPreview: {
     title: 'Previzualizare',
-    contentRequired: 'Conținutul este obligatoriu',
+    contentRequired: 'Conținut obligatoriu',
     copyToClipboard: 'Copiază în Clipboard',
     copied: 'Copiat!',
     downloadAs: 'Descarcă ca',
