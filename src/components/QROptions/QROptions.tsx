@@ -24,34 +24,28 @@ interface QROptionsProps {
 function Section({
   title,
   children,
-  defaultOpen = true,
   isOpen,
   onToggle
 }: {
   title: string;
   children: React.ReactNode;
-  defaultOpen?: boolean;
-  isOpen?: boolean;
-  onToggle?: () => void;
+  isOpen: boolean;
+  onToggle: () => void;
 }) {
-  const [internalIsOpen, setInternalIsOpen] = useState(defaultOpen);
-  const open = isOpen !== undefined ? isOpen : internalIsOpen;
-  const toggle = onToggle || (() => setInternalIsOpen(!internalIsOpen));
-
   return (
     <div className="options-section">
       <button
         className="section-header"
-        onClick={toggle}
-        aria-expanded={open}
+        onClick={onToggle}
+        aria-expanded={isOpen}
       >
         <span className="section-title">{title}</span>
         <ChevronDown
-          className={`section-chevron ${open ? 'open' : ''}`}
+          className={`section-chevron ${isOpen ? 'open' : ''}`}
           size={16}
         />
       </button>
-      {open && <div className="section-content">{children}</div>}
+      {isOpen && <div className="section-content">{children}</div>}
     </div>
   );
 }
