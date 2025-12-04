@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { LanguageProvider } from './i18n';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import QRCodeGenerator from './components/QRCodeGenerator/QRCodeGenerator';
@@ -22,13 +23,15 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <Header theme={theme} onToggleTheme={toggleTheme} />
-      <main className="app-main">
-        <QRCodeGenerator />
-      </main>
-      <Footer />
-    </div>
+    <LanguageProvider>
+      <div className="app">
+        <Header theme={theme} onToggleTheme={toggleTheme} />
+        <main className="app-main">
+          <QRCodeGenerator />
+        </main>
+        <Footer />
+      </div>
+    </LanguageProvider>
   );
 }
 

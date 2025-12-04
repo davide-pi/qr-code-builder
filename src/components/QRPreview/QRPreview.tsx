@@ -4,6 +4,7 @@ import type { Options } from 'qr-code-styling';
 import { jsPDF } from 'jspdf';
 import type { QROptions } from '../../types/qr';
 import { Copy, Check, Download, AlertTriangle } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 import './QRPreview.css';
 
 interface QRPreviewProps {
@@ -11,6 +12,7 @@ interface QRPreviewProps {
 }
 
 export default function QRPreview({ options }: QRPreviewProps) {
+  const { t } = useLanguage();
   const qrRef = useRef<HTMLDivElement>(null);
   const qrCodeRef = useRef<QRCodeStyling | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -24,7 +26,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
   const isDataValid = !isDataEmpty && !error;
 
   // Display message (error or empty state)
-  const displayError = error || (isDataEmpty ? 'Content is required' : null);
+  const displayError = error || (isDataEmpty ? t.qrPreview.contentRequired : null);
 
   // Build QR code styling options from our state
   const buildQROptions = useCallback((): Options => {
@@ -93,7 +95,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
       setError(null);
     } catch (err) {
       console.error('Failed to initialize QR code:', err);
-      setError('Failed to initialize QR code');
+      setError(t.qrPreview.errors.failedToInitialize);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -112,7 +114,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
                     : options.errorCorrectionLevel === 'Q' ? 1663
                     : 1273; // H
     if (dataLength > maxLength) {
-      setError(`Content is too long. Maximum ${maxLength.toLocaleString()} characters for error correction level ${options.errorCorrectionLevel}.`);
+      setError(t.qrPreview.errors.contentTooLong.replace('{max}', maxLength.toLocaleString()).replace('{level}', options.errorCorrectionLevel));
       return;
     }
 
@@ -126,9 +128,9 @@ export default function QRPreview({ options }: QRPreviewProps) {
       console.error('Failed to update QR code:', errorMessage);
 
       if (errorMessage.includes('overflow') || errorMessage.includes('length')) {
-        setError('Content is too long for the selected error correction level.');
+        setError(t.qrPreview.errors.contentTooLong.replace('{max}', '').replace('{level}', options.errorCorrectionLevel));
       } else {
-        setError('Failed to generate QR code.');
+        setError(t.qrPreview.errors.failedToGenerate);
       }
 
       // Recreate QR code with last valid options to fix DOM state
@@ -197,7 +199,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
       qrCodeRef.current.download({ name: 'qr-code', extension: 'png' });
     } catch (err) {
       console.error('Failed to download PNG:', err);
-      setError('Failed to download PNG');
+      setError(`${t.qrPreview.errors.failedToDownload} PNG`);
     }
   };
 
@@ -236,7 +238,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
       }
     } catch (err) {
       console.error('Failed to download SVG:', err);
-      setError('Failed to download SVG');
+      setError(`${t.qrPreview.errors.failedToDownload} SVG`);
     }
   };
 
@@ -261,13 +263,13 @@ export default function QRPreview({ options }: QRPreviewProps) {
       }
     } catch (err) {
       console.error('Failed to download PDF:', err);
-      setError('Failed to download PDF');
+      setError(`${t.qrPreview.errors.failedToDownload} PDF`);
     }
   };
 
   return (
-    <div className="qr-preview-section" role="region" aria-label="QR Code Preview">
-      <h2>Preview</h2>
+    <div className="qr-preview-section" role="region" aria-label={t.qrPreview.title}>
+      <h2>{t.qrPreview.title}</h2>
 
       {displayError && (
         <div className="qr-error" role="alert">
@@ -286,19 +288,19 @@ export default function QRPreview({ options }: QRPreviewProps) {
         <button
           onClick={copyToClipboard}
           className="btn btn-copy"
-          aria-label="Copy QR code to clipboard"
+          aria-label={t.qrPreview.copyToClipboard}
           disabled={!isDataValid || !!error}
         >
           {copySuccess ? <Check size={16} /> : <Copy size={16} />}
-          {copySuccess ? 'Copied!' : 'Copy to Clipboard'}
+          {copySuccess ? t.qrPreview.copied : t.qrPreview.copyToClipboard}
         </button>
       </div>
 
-      <div className="export-buttons" role="group" aria-label="Download options">
+      <div className="export-buttons" role="group" aria-label={t.qrPreview.downloadAs}>
         <button
           onClick={downloadPNG}
           className="btn btn-export"
-          aria-label="Download as PNG"
+          aria-label={`${t.qrPreview.downloadAs} PNG`}
           disabled={!isDataValid || !!error}
         >
           <Download size={16} />
@@ -307,7 +309,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
         <button
           onClick={downloadSVG}
           className="btn btn-export"
-          aria-label="Download as SVG"
+          aria-label={`${t.qrPreview.downloadAs} SVG`}
           disabled={!isDataValid || !!error}
         >
           <Download size={16} />
@@ -316,7 +318,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
         <button
           onClick={downloadPDF}
           className="btn btn-export"
-          aria-label="Download as PDF"
+          aria-label={`${t.qrPreview.downloadAs} PDF`}
           disabled={!isDataValid || !!error}
         >
           <Download size={16} />
