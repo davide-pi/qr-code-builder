@@ -235,8 +235,6 @@ export const getDefaultCalendarData = (): CalendarData => ({
   allDay: false,
 });
 
-export const defaultCalendarData: CalendarData = getDefaultCalendarData();
-
 export const defaultLocationData: LocationData = {
   latitude: '',
   longitude: '',
@@ -310,13 +308,7 @@ export const templateDefinitions: TemplateDefinition[] = [
   { type: 'location', label: 'Location', category: 'links', description: 'Geo location' },
 ];
 
-export const categoryLabels: Record<TemplateCategory, string> = {
-  all: 'All',
-  links: 'Links',
-  contact: 'Contact & Messaging',
-  social: 'Social',
-  payment: 'Payment',
-};
+
 
 export const dotTypes: DotType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded'];
 export const cornerSquareTypes: CornerSquareType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded', 'dot'];

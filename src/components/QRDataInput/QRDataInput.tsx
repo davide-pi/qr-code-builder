@@ -37,8 +37,8 @@ import {
   defaultPayPalData,
   defaultBitcoinData,
   templateDefinitions,
-  categoryLabels,
 } from '../../types/qr';
+import { useLanguage } from '../../i18n';
 import CountryCodeSelect from '../CountryCodeSelect/CountryCodeSelect';
 import './QRDataInput.css';
 
@@ -273,6 +273,8 @@ const generateQRString = (type: QRTemplateType, data: QRTemplateData): string =>
 };
 
 export default function QRDataInput({ templateType, onTemplateChange, onDataChange }: QRDataInputProps) {
+  const { t } = useLanguage();
+
   // Template data states
   const [urlData, setUrlData] = useState<URLData>(defaultURLData);
   const [vcardData, setVcardData] = useState<VCardData>(defaultVCardData);
@@ -335,7 +337,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="url">URL *</label>
+              <label htmlFor="url">{t.qrDataInput.form.url} *</label>
               <input
                 type="url"
                 id="url"
@@ -345,7 +347,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setUrlData(newData);
                   updateData('url', newData);
                 }}
-                placeholder="https://example.com"
+                placeholder={t.qrDataInput.form.urlPlaceholder}
               />
             </div>
           </div>
@@ -356,7 +358,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
           <div className="template-form">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="firstName">First Name</label>
+                <label htmlFor="firstName">{t.qrDataInput.form.firstName}</label>
                 <input
                   type="text"
                   id="firstName"
@@ -369,7 +371,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="lastName">Last Name</label>
+                <label htmlFor="lastName">{t.qrDataInput.form.lastName}</label>
                 <input
                   type="text"
                   id="lastName"
@@ -383,7 +385,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor="organization">Organization</label>
+              <label htmlFor="organization">{t.qrDataInput.form.organization}</label>
               <input
                 type="text"
                 id="organization"
@@ -396,7 +398,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
               />
             </div>
             <div className="form-group">
-              <label htmlFor="title">Job Title</label>
+              <label htmlFor="title">{t.qrDataInput.form.jobTitle}</label>
               <input
                 type="text"
                 id="title"
@@ -410,7 +412,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="phone">Phone</label>
+                <label htmlFor="phone">{t.qrDataInput.form.phone}</label>
                 <input
                   type="tel"
                   id="phone"
@@ -423,7 +425,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="vcardEmail">Email</label>
+                <label htmlFor="vcardEmail">{t.qrDataInput.form.email}</label>
                 <input
                   type="email"
                   id="vcardEmail"
@@ -437,7 +439,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor="website">Website</label>
+              <label htmlFor="website">{t.qrDataInput.form.website}</label>
               <input
                 type="url"
                 id="website"
@@ -450,7 +452,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
               />
             </div>
             <div className="form-group">
-              <label htmlFor="address">Address</label>
+              <label htmlFor="address">{t.qrDataInput.form.address}</label>
               <input
                 type="text"
                 id="address"
@@ -464,7 +466,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="city">City</label>
+                <label htmlFor="city">{t.qrDataInput.form.city}</label>
                 <input
                   type="text"
                   id="city"
@@ -477,7 +479,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="state">State</label>
+                <label htmlFor="state">{t.qrDataInput.form.state}</label>
                 <input
                   type="text"
                   id="state"
@@ -492,7 +494,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="zip">Zip Code</label>
+                <label htmlFor="zip">{t.qrDataInput.form.zipCode}</label>
                 <input
                   type="text"
                   id="zip"
@@ -505,7 +507,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="country">Country</label>
+                <label htmlFor="country">{t.qrDataInput.form.country}</label>
                 <input
                   type="text"
                   id="country"
@@ -525,7 +527,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="ssid">Network Name (SSID) *</label>
+              <label htmlFor="ssid">{t.qrDataInput.form.networkName} *</label>
               <input
                 type="text"
                 id="ssid"
@@ -535,11 +537,11 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setWifiData(newData);
                   updateData('wifi', newData);
                 }}
-                placeholder="MyWiFiNetwork"
+                placeholder={t.qrDataInput.form.networkNamePlaceholder}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">{t.qrDataInput.form.password}</label>
               <input
                 type="text"
                 id="password"
@@ -552,7 +554,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
               />
             </div>
             <div className="form-group">
-              <label htmlFor="encryption">Encryption</label>
+              <label htmlFor="encryption">{t.qrDataInput.form.encryption}</label>
               <select
                 id="encryption"
                 value={wifiData.encryption}
@@ -578,7 +580,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                     updateData('wifi', newData);
                   }}
                 />
-                Hidden Network
+                {t.qrDataInput.form.hiddenNetwork}
               </label>
             </div>
           </div>
@@ -588,7 +590,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="emailAddress">Email Address *</label>
+              <label htmlFor="emailAddress">{t.qrDataInput.form.emailAddress} *</label>
               <input
                 type="email"
                 id="emailAddress"
@@ -598,11 +600,11 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setEmailData(newData);
                   updateData('email', newData);
                 }}
-                placeholder="example@email.com"
+                placeholder={t.qrDataInput.form.emailPlaceholder}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="subject">Subject</label>
+              <label htmlFor="subject">{t.qrDataInput.form.subject}</label>
               <input
                 type="text"
                 id="subject"
@@ -615,7 +617,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
               />
             </div>
             <div className="form-group">
-              <label htmlFor="body">Message</label>
+              <label htmlFor="body">{t.qrDataInput.form.message}</label>
               <textarea
                 id="body"
                 value={emailData.body}
@@ -634,7 +636,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label>Phone Number *</label>
+              <label>{t.qrDataInput.form.phoneNumber} *</label>
               <div className="phone-input-group">
                 <div className="country-code-select-wrapper">
                   <CountryCodeSelect
@@ -656,12 +658,12 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                     setSmsData(newData);
                     updateData('sms', newData);
                   }}
-                  placeholder="123456789"
+                  placeholder={t.qrDataInput.form.phonePlaceholder}
                 />
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor="message">Message</label>
+              <label htmlFor="message">{t.qrDataInput.form.message}</label>
               <textarea
                 id="message"
                 value={smsData.message}
@@ -680,7 +682,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label>Phone Number *</label>
+              <label>{t.qrDataInput.form.phoneNumber} *</label>
               <div className="phone-input-group">
                 <div className="country-code-select-wrapper">
                   <CountryCodeSelect
@@ -702,7 +704,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                     setPhoneData(newData);
                     updateData('phone', newData);
                   }}
-                  placeholder="123456789"
+                  placeholder={t.qrDataInput.form.phonePlaceholder}
                 />
               </div>
             </div>
@@ -713,7 +715,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="eventTitle">Event Title *</label>
+              <label htmlFor="eventTitle">{t.qrDataInput.form.eventTitle} *</label>
               <input
                 type="text"
                 id="eventTitle"
@@ -723,11 +725,11 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setCalendarData(newData);
                   updateData('calendar', newData);
                 }}
-                placeholder="Meeting Title"
+                placeholder={t.qrDataInput.form.eventTitlePlaceholder}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="eventLocation">Location</label>
+              <label htmlFor="eventLocation">{t.qrDataInput.form.eventLocation}</label>
               <input
                 type="text"
                 id="eventLocation"
@@ -740,7 +742,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
               />
             </div>
             <div className="form-group">
-              <label htmlFor="eventDescription">Description</label>
+              <label htmlFor="eventDescription">{t.qrDataInput.form.description}</label>
               <textarea
                 id="eventDescription"
                 value={calendarData.description}
@@ -763,13 +765,13 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                     updateData('calendar', newData);
                   }}
                 />
-                All Day Event
+                {t.qrDataInput.form.allDayEvent}
               </label>
             </div>
             {calendarData.allDay ? (
               <>
                 <div className="form-group">
-                  <label htmlFor="startDateOnly">Start Date</label>
+                  <label htmlFor="startDateOnly">{t.qrDataInput.form.startDate}</label>
                   <input
                     type="date"
                     id="startDateOnly"
@@ -783,7 +785,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="endDateOnly">End Date</label>
+                  <label htmlFor="endDateOnly">{t.qrDataInput.form.endDate}</label>
                   <input
                     type="date"
                     id="endDateOnly"
@@ -800,7 +802,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
             ) : (
               <>
                 <div className="form-group">
-                  <label htmlFor="startDate">Start Date & Time</label>
+                  <label htmlFor="startDate">{t.qrDataInput.form.startDateTime}</label>
                   <input
                     type="datetime-local"
                     id="startDate"
@@ -814,7 +816,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="endDate">End Date & Time</label>
+                  <label htmlFor="endDate">{t.qrDataInput.form.endDateTime}</label>
                   <input
                     type="datetime-local"
                     id="endDate"
@@ -836,7 +838,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="latitude">Latitude *</label>
+              <label htmlFor="latitude">{t.qrDataInput.form.latitude} *</label>
               <input
                 type="text"
                 id="latitude"
@@ -846,11 +848,11 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setLocationData(newData);
                   updateData('location', newData);
                 }}
-                placeholder="37.7749"
+                placeholder={t.qrDataInput.form.latitudePlaceholder}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="longitude">Longitude *</label>
+              <label htmlFor="longitude">{t.qrDataInput.form.longitude} *</label>
               <input
                 type="text"
                 id="longitude"
@@ -860,11 +862,11 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setLocationData(newData);
                   updateData('location', newData);
                 }}
-                placeholder="-122.4194"
+                placeholder={t.qrDataInput.form.longitudePlaceholder}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="locationLabel">Label</label>
+              <label htmlFor="locationLabel">{t.qrDataInput.form.label}</label>
               <input
                 type="text"
                 id="locationLabel"
@@ -874,7 +876,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setLocationData(newData);
                   updateData('location', newData);
                 }}
-                placeholder="San Francisco, CA"
+                placeholder={t.qrDataInput.form.labelPlaceholder}
               />
             </div>
           </div>
@@ -884,7 +886,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label>Phone Number *</label>
+              <label>{t.qrDataInput.form.phoneNumber} *</label>
               <div className="phone-input-group">
                 <div className="country-code-select-wrapper">
                   <CountryCodeSelect
@@ -906,12 +908,12 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                     setWhatsappData(newData);
                     updateData('whatsapp', newData);
                   }}
-                  placeholder="123456789"
+                  placeholder={t.qrDataInput.form.phonePlaceholder}
                 />
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor="waMessage">Pre-filled Message</label>
+              <label htmlFor="waMessage">{t.qrDataInput.form.prefilledMessage}</label>
               <textarea
                 id="waMessage"
                 value={whatsappData.message}
@@ -931,7 +933,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="tgUsername">Username *</label>
+              <label htmlFor="tgUsername">{t.qrDataInput.form.username} *</label>
               <input
                 type="text"
                 id="tgUsername"
@@ -941,11 +943,11 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setTelegramData(newData);
                   updateData('telegram', newData);
                 }}
-                placeholder="@username or username"
+                placeholder={t.qrDataInput.form.usernamePlaceholder}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="tgMessage">Prefilled Message</label>
+              <label htmlFor="tgMessage">{t.qrDataInput.form.prefilledMessage}</label>
               <textarea
                 id="tgMessage"
                 value={telegramData.message}
@@ -965,7 +967,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="igUsername">Username *</label>
+              <label htmlFor="igUsername">{t.qrDataInput.form.username} *</label>
               <input
                 type="text"
                 id="igUsername"
@@ -975,7 +977,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setInstagramData(newData);
                   updateData('instagram', newData);
                 }}
-                placeholder="@username or username"
+                placeholder={t.qrDataInput.form.usernamePlaceholder}
               />
             </div>
           </div>
@@ -985,7 +987,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="twUsername">Username *</label>
+              <label htmlFor="twUsername">{t.qrDataInput.form.username} *</label>
               <input
                 type="text"
                 id="twUsername"
@@ -995,7 +997,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setTwitterData(newData);
                   updateData('twitter', newData);
                 }}
-                placeholder="@username or username"
+                placeholder={t.qrDataInput.form.usernamePlaceholder}
               />
             </div>
           </div>
@@ -1005,7 +1007,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="liUsername">Profile ID *</label>
+              <label htmlFor="liUsername">{t.qrDataInput.form.profileId} *</label>
               <input
                 type="text"
                 id="liUsername"
@@ -1015,7 +1017,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setLinkedinData(newData);
                   updateData('linkedin', newData);
                 }}
-                placeholder="john-doe-123456"
+                placeholder={t.qrDataInput.form.profileIdPlaceholder}
               />
             </div>
           </div>
@@ -1025,7 +1027,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="ttUsername">Username *</label>
+              <label htmlFor="ttUsername">{t.qrDataInput.form.username} *</label>
               <input
                 type="text"
                 id="ttUsername"
@@ -1035,7 +1037,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setTiktokData(newData);
                   updateData('tiktok', newData);
                 }}
-                placeholder="@username or username"
+                placeholder={t.qrDataInput.form.usernamePlaceholder}
               />
             </div>
           </div>
@@ -1045,7 +1047,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="ytUsername">Channel Handle *</label>
+              <label htmlFor="ytUsername">{t.qrDataInput.form.channelHandle} *</label>
               <input
                 type="text"
                 id="ytUsername"
@@ -1055,7 +1057,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setYoutubeData(newData);
                   updateData('youtube', newData);
                 }}
-                placeholder="@channelname"
+                placeholder={t.qrDataInput.form.channelHandlePlaceholder}
               />
             </div>
           </div>
@@ -1065,7 +1067,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="fbUsername">Page/Profile Name *</label>
+              <label htmlFor="fbUsername">{t.qrDataInput.form.pageProfileName} *</label>
               <input
                 type="text"
                 id="fbUsername"
@@ -1075,7 +1077,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setFacebookData(newData);
                   updateData('facebook', newData);
                 }}
-                placeholder="pagename or profile.id"
+                placeholder={t.qrDataInput.form.pageProfilePlaceholder}
               />
             </div>
           </div>
@@ -1085,7 +1087,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="scUsername">Username *</label>
+              <label htmlFor="scUsername">{t.qrDataInput.form.username} *</label>
               <input
                 type="text"
                 id="scUsername"
@@ -1095,7 +1097,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setSnapchatData(newData);
                   updateData('snapchat', newData);
                 }}
-                placeholder="username"
+                placeholder={t.qrDataInput.form.usernamePlaceholder}
               />
             </div>
           </div>
@@ -1105,7 +1107,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="ppUsername">PayPal.me Username *</label>
+              <label htmlFor="ppUsername">{t.qrDataInput.form.paypalUsername} *</label>
               <input
                 type="text"
                 id="ppUsername"
@@ -1115,12 +1117,12 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setPaypalData(newData);
                   updateData('paypal', newData);
                 }}
-                placeholder="yourusername"
+                placeholder={t.qrDataInput.form.paypalUsernamePlaceholder}
               />
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="ppAmount">Amount (optional)</label>
+                <label htmlFor="ppAmount">{t.qrDataInput.form.amount}</label>
                 <input
                   type="text"
                   id="ppAmount"
@@ -1130,11 +1132,11 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                     setPaypalData(newData);
                     updateData('paypal', newData);
                   }}
-                  placeholder="10.00"
+                  placeholder={t.qrDataInput.form.amountPlaceholder}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="ppCurrency">Currency</label>
+                <label htmlFor="ppCurrency">{t.qrDataInput.form.currency}</label>
                 <select
                   id="ppCurrency"
                   value={paypalData.currency || 'USD'}
@@ -1159,7 +1161,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         return (
           <div className="template-form">
             <div className="form-group">
-              <label htmlFor="btcAddress">Bitcoin Address *</label>
+              <label htmlFor="btcAddress">{t.qrDataInput.form.bitcoinAddress} *</label>
               <input
                 type="text"
                 id="btcAddress"
@@ -1169,12 +1171,12 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                   setBitcoinData(newData);
                   updateData('bitcoin', newData);
                 }}
-                placeholder="bc1q..."
+                placeholder={t.qrDataInput.form.bitcoinAddressPlaceholder}
               />
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="btcAmount">Amount (BTC)</label>
+                <label htmlFor="btcAmount">{t.qrDataInput.form.amountBtc}</label>
                 <input
                   type="text"
                   id="btcAmount"
@@ -1184,11 +1186,11 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                     setBitcoinData(newData);
                     updateData('bitcoin', newData);
                   }}
-                  placeholder="0.001"
+                  placeholder={t.qrDataInput.form.amountPlaceholder}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="btcLabel">Label</label>
+                <label htmlFor="btcLabel">{t.qrDataInput.form.label}</label>
                 <input
                   type="text"
                   id="btcLabel"
@@ -1198,7 +1200,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                     setBitcoinData(newData);
                     updateData('bitcoin', newData);
                   }}
-                  placeholder="Donation"
+                  placeholder={t.qrDataInput.form.labelPlaceholder}
                 />
               </div>
             </div>
@@ -1229,11 +1231,11 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
 
   return (
     <div className="qr-data-input">
-      <h2>QR Content</h2>
+      <h2>{t.qrDataInput.title}</h2>
 
       {/* Custom Template Dropdown with Icons */}
       <div className="template-dropdown-container" ref={dropdownRef}>
-        <label>Template Type</label>
+        <label>{t.qrDataInput.templateType}</label>
         <button
           type="button"
           className={`template-dropdown-trigger ${isDropdownOpen ? 'open' : ''}`}
@@ -1243,7 +1245,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
         >
           <span className="template-dropdown-selected">
             <CurrentIcon size={18} />
-            <span>{currentTemplate?.label || 'Select Template'}</span>
+            <span>{currentTemplate ? t.qrDataInput.templates[currentTemplate.type] : t.qrDataInput.selectTemplate}</span>
           </span>
           <ChevronDown size={18} className={`dropdown-chevron ${isDropdownOpen ? 'rotated' : ''}`} />
         </button>
@@ -1255,8 +1257,8 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
               if (categoryTemplates.length === 0) return null;
               return (
                 <div key={category} className="template-dropdown-group">
-                  <div className="template-dropdown-group-label">{categoryLabels[category]}</div>
-                  {categoryTemplates.map(({ type, label }) => {
+                  <div className="template-dropdown-group-label">{t.qrDataInput.categories[category]}</div>
+                  {categoryTemplates.map(({ type }) => {
                     const Icon = templateIcons[type];
                     return (
                       <button
@@ -1271,7 +1273,7 @@ export default function QRDataInput({ templateType, onTemplateChange, onDataChan
                         aria-selected={type === templateType}
                       >
                         <Icon size={16} />
-                        <span>{label}</span>
+                        <span>{t.qrDataInput.templates[type]}</span>
                       </button>
                     );
                   })}

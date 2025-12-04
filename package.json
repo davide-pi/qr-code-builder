@@ -14,6 +14,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "flag-icons": "^7.5.0",
     "jspdf": "^3.0.4",
     "libphonenumber-js": "^1.12.31",
     "lucide-react": "^0.555.0",

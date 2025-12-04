@@ -4,6 +4,7 @@ import type { QROptions as QROptionsType, GradientConfig, ColorPreset } from '..
 import { dotTypes, cornerSquareTypes, cornerDotTypes, gradientTypes, errorCorrectionLevels, defaultColorPresets } from '../../types/qr';
 import StylePicker, { DotStylePreview, CornerSquarePreview, CornerDotPreview } from '../StylePicker/StylePicker';
 import { Undo2, Redo2, RotateCcw, ChevronDown, Upload, ChevronsDownUp, ChevronsUpDown } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 import './QROptions.css';
 
 interface QROptionsProps {
@@ -23,34 +24,28 @@ interface QROptionsProps {
 function Section({
   title,
   children,
-  defaultOpen = true,
   isOpen,
   onToggle
 }: {
   title: string;
   children: React.ReactNode;
-  defaultOpen?: boolean;
-  isOpen?: boolean;
-  onToggle?: () => void;
+  isOpen: boolean;
+  onToggle: () => void;
 }) {
-  const [internalIsOpen, setInternalIsOpen] = useState(defaultOpen);
-  const open = isOpen !== undefined ? isOpen : internalIsOpen;
-  const toggle = onToggle || (() => setInternalIsOpen(!internalIsOpen));
-
   return (
     <div className="options-section">
       <button
         className="section-header"
-        onClick={toggle}
-        aria-expanded={open}
+        onClick={onToggle}
+        aria-expanded={isOpen}
       >
         <span className="section-title">{title}</span>
         <ChevronDown
-          className={`section-chevron ${open ? 'open' : ''}`}
+          className={`section-chevron ${isOpen ? 'open' : ''}`}
           size={16}
         />
       </button>
-      {open && <div className="section-content">{children}</div>}
+      {isOpen && <div className="section-content">{children}</div>}
     </div>
   );
 }
@@ -67,6 +62,7 @@ export default function QROptions({
   canRedo,
   onResetToDefault,
 }: QROptionsProps) {
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [allSectionsOpen, setAllSectionsOpen] = useState(false);
@@ -142,15 +138,15 @@ export default function QROptions({
   };
 
   return (
-    <div className="qr-options-section" role="form" aria-label="QR Code Customization Options">
+    <div className="qr-options-section" role="form" aria-label={t.qrOptions.title}>
       <div className="options-header">
-        <h2>Customize</h2>
+        <h2>{t.qrOptions.title}</h2>
         <div className="header-actions">
           <button
             onClick={toggleAllSections}
             className="btn-icon"
-            title={allSectionsOpen ? "Collapse all sections" : "Expand all sections"}
-            aria-label={allSectionsOpen ? "Collapse all sections" : "Expand all sections"}
+            title={allSectionsOpen ? t.qrOptions.collapseAll : t.qrOptions.expandAll}
+            aria-label={allSectionsOpen ? t.qrOptions.collapseAll : t.qrOptions.expandAll}
           >
             {allSectionsOpen ? <ChevronsDownUp size={16} /> : <ChevronsUpDown size={16} />}
           </button>
@@ -158,8 +154,8 @@ export default function QROptions({
             onClick={onUndo}
             disabled={!canUndo}
             className="btn-icon"
-            title="Undo (Ctrl+Z)"
-            aria-label="Undo last change"
+            title={`${t.qrOptions.undo} (Ctrl+Z)`}
+            aria-label={t.qrOptions.undo}
           >
             <Undo2 size={16} />
           </button>
@@ -167,16 +163,16 @@ export default function QROptions({
             onClick={onRedo}
             disabled={!canRedo}
             className="btn-icon"
-            title="Redo (Ctrl+Y)"
-            aria-label="Redo last change"
+            title={`${t.qrOptions.redo} (Ctrl+Y)`}
+            aria-label={t.qrOptions.redo}
           >
             <Redo2 size={16} />
           </button>
           <button
             onClick={onResetToDefault}
             className="btn-icon"
-            title="Reset to defaults"
-            aria-label="Reset all settings to default"
+            title={t.qrOptions.resetToDefaults}
+            aria-label={t.qrOptions.resetToDefaults}
           >
             <RotateCcw size={16} />
           </button>
@@ -184,9 +180,9 @@ export default function QROptions({
       </div>
 
       {/* Error Correction Section */}
-      <Section title="Error Correction" isOpen={sectionsState.errorCorrection} onToggle={() => toggleSection('errorCorrection')}>
+      <Section title={t.qrOptions.sections.errorCorrection} isOpen={sectionsState.errorCorrection} onToggle={() => toggleSection('errorCorrection')}>
         <div className="option-group">
-          <label id="error-correction-label">Level</label>
+          <label id="error-correction-label">{t.qrOptions.errorCorrection.level}</label>
           <div
             className="error-correction-options"
             role="listbox"
@@ -212,7 +208,7 @@ export default function QROptions({
                     (buttons?.[newIndex] as HTMLElement)?.focus();
                   }
                 }}
-                title={level.description}
+                title={t.qrOptions.errorCorrection.levels[level.value as keyof typeof t.qrOptions.errorCorrection.levels]}
                 role="option"
                 aria-selected={options.errorCorrectionLevel === level.value}
                 tabIndex={options.errorCorrectionLevel === level.value ? 0 : -1}
@@ -225,45 +221,45 @@ export default function QROptions({
       </Section>
 
       {/* Style Section */}
-      <Section title="Style" isOpen={sectionsState.style} onToggle={() => toggleSection('style')}>
+      <Section title={t.qrOptions.sections.style} isOpen={sectionsState.style} onToggle={() => toggleSection('style')}>
         <div className="option-group">
-          <label id="dot-style-label">Dot Style</label>
+          <label id="dot-style-label">{t.qrOptions.style.dotStyle}</label>
           <StylePicker
             options={dotTypes}
             value={options.dotType}
             onChange={(type) => onUpdateOption('dotType', type)}
             PreviewComponent={DotStylePreview}
-            label="Dot style options"
+            label={t.qrOptions.style.dotStyle}
           />
         </div>
 
         <div className="option-group">
-          <label id="corner-square-label">Corner Square Style</label>
+          <label id="corner-square-label">{t.qrOptions.style.cornerSquareStyle}</label>
           <StylePicker
             options={cornerSquareTypes}
             value={options.cornerSquareType}
             onChange={(type) => onUpdateOption('cornerSquareType', type)}
             PreviewComponent={CornerSquarePreview}
-            label="Corner square style options"
+            label={t.qrOptions.style.cornerSquareStyle}
           />
         </div>
 
         <div className="option-group">
-          <label id="corner-dot-label">Corner Dot Style</label>
+          <label id="corner-dot-label">{t.qrOptions.style.cornerDotStyle}</label>
           <StylePicker
             options={cornerDotTypes}
             value={options.cornerDotType}
             onChange={(type) => onUpdateOption('cornerDotType', type)}
             PreviewComponent={CornerDotPreview}
-            label="Corner dot style options"
+            label={t.qrOptions.style.cornerDotStyle}
           />
         </div>
       </Section>
 
       {/* Colors Section */}
-      <Section title="Colors" isOpen={sectionsState.colors} onToggle={() => toggleSection('colors')}>
+      <Section title={t.qrOptions.sections.colors} isOpen={sectionsState.colors} onToggle={() => toggleSection('colors')}>
         <div className="option-group">
-          <label id="color-presets-label">Quick Presets</label>
+          <label id="color-presets-label">{t.qrOptions.colors.quickPresets}</label>
           <div
             className="color-presets"
             role="listbox"
@@ -306,14 +302,14 @@ export default function QROptions({
               checked={options.dotGradient.enabled}
               onChange={(e) => onUpdateGradient({ enabled: e.target.checked })}
             />
-            Use Gradient for Dots
+            {t.qrOptions.colors.useGradient}
           </label>
         </div>
 
         {options.dotGradient.enabled ? (
           <div className="gradient-options">
             <div className="option-group">
-              <label htmlFor="gradientType">Gradient Type</label>
+              <label htmlFor="gradientType">{t.qrOptions.colors.gradientType}</label>
               <select
                 id="gradientType"
                 value={options.dotGradient.type}
@@ -328,7 +324,7 @@ export default function QROptions({
             </div>
 
             <div className="option-group">
-              <label htmlFor="gradientRotation">Rotation: {options.dotGradient.rotation}°</label>
+              <label htmlFor="gradientRotation">{t.qrOptions.colors.rotation}: {options.dotGradient.rotation}°</label>
               <input
                 type="range"
                 id="gradientRotation"
@@ -341,7 +337,7 @@ export default function QROptions({
 
             <div className="color-row">
               <div className="option-group">
-                <label htmlFor="gradientColor1">Start</label>
+                <label htmlFor="gradientColor1">{t.qrOptions.colors.startColor}</label>
                 <input
                   type="color"
                   id="gradientColor1"
@@ -350,7 +346,7 @@ export default function QROptions({
                 />
               </div>
               <div className="option-group">
-                <label htmlFor="gradientColor2">End</label>
+                <label htmlFor="gradientColor2">{t.qrOptions.colors.endColor}</label>
                 <input
                   type="color"
                   id="gradientColor2"
@@ -362,7 +358,7 @@ export default function QROptions({
           </div>
         ) : (
           <div className="option-group">
-            <label htmlFor="dotColor">Dot Color</label>
+            <label htmlFor="dotColor">{t.qrOptions.colors.dotColor}</label>
             <input
               type="color"
               id="dotColor"
@@ -374,7 +370,7 @@ export default function QROptions({
 
         <div className="color-row">
           <div className="option-group">
-            <label htmlFor="cornerSquareColor">Corner Square</label>
+            <label htmlFor="cornerSquareColor">{t.qrOptions.colors.cornerSquare}</label>
             <input
               type="color"
               id="cornerSquareColor"
@@ -383,7 +379,7 @@ export default function QROptions({
             />
           </div>
           <div className="option-group">
-            <label htmlFor="cornerDotColor">Corner Dot</label>
+            <label htmlFor="cornerDotColor">{t.qrOptions.colors.cornerDot}</label>
             <input
               type="color"
               id="cornerDotColor"
@@ -395,7 +391,7 @@ export default function QROptions({
       </Section>
 
       {/* Background Section */}
-      <Section title="Background" isOpen={sectionsState.background} onToggle={() => toggleSection('background')}>
+      <Section title={t.qrOptions.sections.background} isOpen={sectionsState.background} onToggle={() => toggleSection('background')}>
         <div className="option-group">
           <label className="checkbox-label">
             <input
@@ -403,13 +399,13 @@ export default function QROptions({
               checked={options.transparentBackground}
               onChange={(e) => onUpdateOption('transparentBackground', e.target.checked)}
             />
-            Transparent Background
+            {t.qrOptions.background.transparent}
           </label>
         </div>
 
         {!options.transparentBackground && (
           <div className="option-group">
-            <label htmlFor="backgroundColor">Background Color</label>
+            <label htmlFor="backgroundColor">{t.qrOptions.background.backgroundColor}</label>
             <input
               type="color"
               id="backgroundColor"
@@ -421,7 +417,7 @@ export default function QROptions({
       </Section>
 
       {/* Logo Section */}
-      <Section title="Center Logo" isOpen={sectionsState.logo} onToggle={() => toggleSection('logo')}>
+      <Section title={t.qrOptions.sections.centerLogo} isOpen={sectionsState.logo} onToggle={() => toggleSection('logo')}>
         <div className="option-group">
           <div
             className={`image-drop-zone ${isDragging ? 'dragging' : ''} ${options.image ? 'has-image' : ''}`}
@@ -436,26 +432,26 @@ export default function QROptions({
             }}
             role="button"
             tabIndex={0}
-            aria-label={options.image ? 'Logo uploaded. Press Enter to change' : 'Drop zone for logo image. Press Enter to browse'}
+            aria-label={options.image ? t.qrOptions.logo.removeLogo : t.qrOptions.logo.dropZone}
           >
             {options.image ? (
               <div className="image-preview-container">
                 <img src={options.image} alt="Logo preview" className="image-preview" />
-                <button onClick={clearImage} className="btn btn-small btn-danger" aria-label="Remove logo">
+                <button onClick={clearImage} className="btn btn-small btn-danger" aria-label={t.qrOptions.logo.removeLogo}>
                   ✕
                 </button>
               </div>
             ) : (
               <>
                 <Upload size={24} />
-                <span>Drag & drop or click to upload</span>
+                <span>{t.qrOptions.logo.dropZone}</span>
                 <input
                   type="file"
                   id="imageUpload"
                   ref={fileInputRef}
                   accept="image/*"
                   onChange={handleImageUpload}
-                  aria-label="Upload logo image"
+                  aria-label={t.qrOptions.logo.dropZone}
                 />
               </>
             )}
@@ -466,7 +462,7 @@ export default function QROptions({
           <>
             <div className="option-group">
               <label htmlFor="imageSize">
-                Size: {Math.round(options.imageSize * 100)}%
+                {t.qrOptions.logo.size}: {Math.round(options.imageSize * 100)}%
               </label>
               <input
                 type="range"
@@ -480,7 +476,7 @@ export default function QROptions({
             </div>
 
             <div className="option-group">
-              <label htmlFor="imageMargin">Margin: {options.imageMargin}px</label>
+              <label htmlFor="imageMargin">{t.qrOptions.logo.margin}: {options.imageMargin}px</label>
               <input
                 type="range"
                 id="imageMargin"

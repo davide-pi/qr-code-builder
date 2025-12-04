@@ -1,3 +1,4 @@
+import { useLanguage } from '../../i18n';
 import './Footer.css';
 
 const GitHubIcon = () => (
@@ -12,17 +13,19 @@ const GitHubIcon = () => (
 );
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="app-footer">
       <div className="footer-content">
         <p>
-          Built by{' '}
+          {t.footer.builtBy}{' '}
           <a href="https://github.com/davide-pi" target="_blank" rel="noopener noreferrer">
             <GitHubIcon /> davide-pi
           </a>
           {' '}•{' '}
           <a href="https://github.com/davide-pi/qr-code-builder" target="_blank" rel="noopener noreferrer">
-            <GitHubIcon /> Repository
+            <GitHubIcon /> {t.footer.repository}
           </a>
         </p>
       </div>
