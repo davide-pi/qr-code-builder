@@ -143,7 +143,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
         }
       }
     }
-  }, [buildQROptions, createQRCode, options.data, options.errorCorrectionLevel]);
+  }, [buildQROptions, createQRCode, options.data, options.errorCorrectionLevel, t.qrPreview.errors.contentTooLong, t.qrPreview.errors.failedToGenerate]);
 
   // Recreate QR code when image or image size changes (update doesn't handle these well)
   useEffect(() => {

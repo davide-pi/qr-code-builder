@@ -70,13 +70,15 @@ export default function QRCodeGenerator() {
 
     // Add to history if not from undo/redo
     if (!isUndoRedoRef.current) {
-      setHistory(prev => {
-        const newHistory = prev.slice(0, historyIndex + 1);
-        newHistory.push(options);
-        if (newHistory.length > MAX_HISTORY) newHistory.shift();
-        return newHistory;
+      setHistoryIndex(currentIndex => {
+        setHistory(prev => {
+          const newHistory = prev.slice(0, currentIndex + 1);
+          newHistory.push(options);
+          if (newHistory.length > MAX_HISTORY) newHistory.shift();
+          return newHistory;
+        });
+        return Math.min(currentIndex + 1, MAX_HISTORY - 1);
       });
-      setHistoryIndex(prev => Math.min(prev + 1, MAX_HISTORY - 1));
     }
     isUndoRedoRef.current = false;
   }, [options]);
