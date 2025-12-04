@@ -602,18 +602,26 @@
   }
 
   .options-header {
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    flex-wrap: nowrap;
+    gap: 0.25rem;
   }
 
   .options-header h2 {
-    font-size: 1.15rem;
-    width: 100%;
+    font-size: 1.1rem;
+    flex: 1;
+    min-width: 0;
   }
 
   .header-actions {
-    width: 100%;
-    justify-content: flex-start;
+    flex-shrink: 0;
+    gap: 0.125rem;
+  }
+
+  .header-actions .btn-icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
   }
 
   /* Error correction buttons stack on very small screens */
