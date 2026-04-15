@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "flag-icons": "^7.5.0",
-    "jspdf": "^4.0.0",
+    "jspdf": "^4.2.0",
     "libphonenumber-js": "^1.12.31",
     "lucide-react": "^0.555.0",
     "qr-code-styling": "^1.9.2",
