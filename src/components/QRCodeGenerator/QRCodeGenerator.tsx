@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import type { QROptions, GradientConfig, ColorPreset, QRTemplateType } from '../../types/qr';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ColorPreset, GradientConfig, QROptions, QRTemplateType } from '../../types/qr';
 import { defaultQROptions, STORAGE_KEY } from '../../types/qr';
 import QRDataInput from '../QRDataInput/QRDataInput';
-import QRPreview from '../QRPreview/QRPreview';
 import QROptionsPanel from '../QROptions/QROptions';
+import QRPreview from '../QRPreview/QRPreview';
 import './QRCodeGenerator.css';
 
 const MAX_HISTORY = 50;

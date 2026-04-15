@@ -1,44 +1,61 @@
-import { useState, useRef, useEffect } from 'react';
+import {
+  Bitcoin,
+  Calendar,
+  ChevronDown,
+  Contact,
+  DollarSign,
+  Facebook,
+  Ghost,
+  Instagram,
+  Link,
+  Linkedin,
+  Mail,
+  MapPin,
+  MessageCircle,
+  MessageSquare,
+  Phone,
+  Send,
+  Twitter,
+  Video,
+  Wifi,
+  Youtube
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '../../i18n';
 import type {
+  BitcoinData,
+  CalendarData,
+  EmailData,
+  LocationData,
+  PayPalData,
+  PhoneData,
+  QRTemplateData,
   QRTemplateType,
+  SMSData,
+  SocialMediaData,
+  TelegramData,
   TemplateCategory,
   URLData,
   VCardData,
-  WiFiData,
-  EmailData,
-  SMSData,
-  CalendarData,
-  LocationData,
-  PhoneData,
   WhatsAppData,
-  TelegramData,
-  SocialMediaData,
-  PayPalData,
-  BitcoinData,
-  QRTemplateData
+  WiFiData
 } from '../../types/qr';
 import {
-  Link, Contact, Wifi, Mail, MessageSquare, Calendar, MapPin, Phone,
-  Instagram, Twitter, Linkedin, Youtube, Facebook,
-  MessageCircle, Send, DollarSign, Bitcoin, Video, ChevronDown, Ghost
-} from 'lucide-react';
-import {
+  defaultBitcoinData,
+  defaultEmailData,
+  defaultLocationData,
+  defaultPayPalData,
+  defaultPhoneData,
+  defaultSMSData,
+  defaultSocialMediaData,
+  defaultTelegramData,
   defaultURLData,
   defaultVCardData,
-  defaultWiFiData,
-  defaultEmailData,
-  defaultSMSData,
-  getDefaultCalendarData,
-  defaultLocationData,
-  defaultPhoneData,
   defaultWhatsAppData,
-  defaultTelegramData,
-  defaultSocialMediaData,
-  defaultPayPalData,
-  defaultBitcoinData,
+  defaultWiFiData,
+  getDefaultCalendarData,
   templateDefinitions,
 } from '../../types/qr';
-import { useLanguage } from '../../i18n';
 import CountryCodeSelect from '../CountryCodeSelect/CountryCodeSelect';
 import './QRDataInput.css';
 
