@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import type { QROptions, GradientConfig, ColorPreset, QRTemplateType } from '../../types/qr';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ColorPreset, GradientConfig, QROptions, QRTemplateType } from '../../types/qr';
 import { defaultQROptions, STORAGE_KEY } from '../../types/qr';
 import QRDataInput from '../QRDataInput/QRDataInput';
-import QRPreview from '../QRPreview/QRPreview';
 import QROptionsPanel from '../QROptions/QROptions';
+import QRPreview from '../QRPreview/QRPreview';
 import './QRCodeGenerator.css';
 
 const MAX_HISTORY = 50;
@@ -35,7 +35,7 @@ const loadSavedOptions = (): QROptions => {
 export default function QRCodeGenerator() {
   const [options, setOptions] = useState<QROptions>(loadSavedOptions);
   const [debouncedData, setDebouncedData] = useState(options.data);
-  const [history, setHistory] = useState<QROptions[]>([loadSavedOptions()]);
+  const [history, setHistory] = useState<QROptions[]>(() => [loadSavedOptions()]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const isUndoRedoRef = useRef(false);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

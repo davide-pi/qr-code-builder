@@ -1,44 +1,61 @@
-import { useState, useRef, useEffect } from 'react';
+import {
+  Bitcoin,
+  Calendar,
+  ChevronDown,
+  Contact,
+  DollarSign,
+  Facebook,
+  Ghost,
+  Instagram,
+  Link,
+  Linkedin,
+  Mail,
+  MapPin,
+  MessageCircle,
+  MessageSquare,
+  Phone,
+  Send,
+  Twitter,
+  Video,
+  Wifi,
+  Youtube
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '../../i18n';
 import type {
+  BitcoinData,
+  CalendarData,
+  EmailData,
+  LocationData,
+  PayPalData,
+  PhoneData,
+  QRTemplateData,
   QRTemplateType,
+  SMSData,
+  SocialMediaData,
+  TelegramData,
   TemplateCategory,
   URLData,
   VCardData,
-  WiFiData,
-  EmailData,
-  SMSData,
-  CalendarData,
-  LocationData,
-  PhoneData,
   WhatsAppData,
-  TelegramData,
-  SocialMediaData,
-  PayPalData,
-  BitcoinData,
-  QRTemplateData
+  WiFiData
 } from '../../types/qr';
 import {
-  Link, Contact, Wifi, Mail, MessageSquare, Calendar, MapPin, Phone,
-  Instagram, Twitter, Linkedin, Youtube, Facebook,
-  MessageCircle, Send, DollarSign, Bitcoin, Video, ChevronDown, Ghost
-} from 'lucide-react';
-import {
+  defaultBitcoinData,
+  defaultEmailData,
+  defaultLocationData,
+  defaultPayPalData,
+  defaultPhoneData,
+  defaultSMSData,
+  defaultSocialMediaData,
+  defaultTelegramData,
   defaultURLData,
   defaultVCardData,
-  defaultWiFiData,
-  defaultEmailData,
-  defaultSMSData,
-  getDefaultCalendarData,
-  defaultLocationData,
-  defaultPhoneData,
   defaultWhatsAppData,
-  defaultTelegramData,
-  defaultSocialMediaData,
-  defaultPayPalData,
-  defaultBitcoinData,
+  defaultWiFiData,
+  getDefaultCalendarData,
   templateDefinitions,
 } from '../../types/qr';
-import { useLanguage } from '../../i18n';
 import CountryCodeSelect from '../CountryCodeSelect/CountryCodeSelect';
 import './QRDataInput.css';
 
@@ -82,18 +99,20 @@ const generateQRString = (type: QRTemplateType, data: QRTemplateData): string =>
 
     case 'vcard': {
       const vcard = data as VCardData;
+      // Escape text values per RFC 2426: \, ;, , and newlines must be escaped
+      const esc = (v: string) => v.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
       const lines = [
         'BEGIN:VCARD',
         'VERSION:3.0',
-        vcard.firstName || vcard.lastName ? `N:${vcard.lastName};${vcard.firstName};;;` : '',
-        vcard.firstName || vcard.lastName ? `FN:${vcard.firstName} ${vcard.lastName}`.trim() : '',
-        vcard.organization ? `ORG:${vcard.organization}` : '',
-        vcard.title ? `TITLE:${vcard.title}` : '',
+        vcard.firstName || vcard.lastName ? `N:${esc(vcard.lastName)};${esc(vcard.firstName)};;;` : '',
+        vcard.firstName || vcard.lastName ? `FN:${esc(`${vcard.firstName} ${vcard.lastName}`.trim())}` : '',
+        vcard.organization ? `ORG:${esc(vcard.organization)}` : '',
+        vcard.title ? `TITLE:${esc(vcard.title)}` : '',
         vcard.phone ? `TEL:${vcard.phone}` : '',
         vcard.email ? `EMAIL:${vcard.email}` : '',
         vcard.website ? `URL:${vcard.website}` : '',
         (vcard.address || vcard.city || vcard.state || vcard.zip || vcard.country)
-          ? `ADR:;;${vcard.address};${vcard.city};${vcard.state};${vcard.zip};${vcard.country}`
+          ? `ADR:;;${esc(vcard.address)};${esc(vcard.city)};${esc(vcard.state)};${esc(vcard.zip)};${esc(vcard.country)}`
           : '',
         'END:VCARD',
       ].filter(line => line);
@@ -103,7 +122,9 @@ const generateQRString = (type: QRTemplateType, data: QRTemplateData): string =>
     case 'wifi': {
       const wifi = data as WiFiData;
       if (!wifi.ssid) return '';
-      return `WIFI:T:${wifi.encryption};S:${wifi.ssid};P:${wifi.password};H:${wifi.hidden ? 'true' : 'false'};;`;
+      // Escape special chars in SSID/password per WiFi QR spec: \, ;, ,, "
+      const escWifi = (v: string) => v.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/"/g, '\\"');
+      return `WIFI:T:${wifi.encryption};S:${escWifi(wifi.ssid)};P:${escWifi(wifi.password)};H:${wifi.hidden ? 'true' : 'false'};;`;
     }
 
     case 'email': {
@@ -133,8 +154,8 @@ const generateQRString = (type: QRTemplateType, data: QRTemplateData): string =>
       // Format datetime-local (YYYY-MM-DDTHH:MM) to iCalendar format (YYYYMMDDTHHMMSS)
       const formatDateTime = (date: string) => {
         if (!date) return '';
-        // Remove dashes, colons, and add seconds
-        return date.replace(/-/g, '').replace('T', 'T').replace(':', '') + '00';
+        // Remove dashes and colons, keep T separator, append seconds
+        return date.replace(/-/g, '').replace(/:/g, '') + '00';
       };
 
       // Format date only (YYYY-MM-DD) to iCalendar date format (YYYYMMDD)

@@ -84,7 +84,7 @@ export const en: Translations = {
       label: 'Label',
       labelPlaceholder: 'San Francisco, CA',
       username: 'Username',
-      usernamePlaceholder: '@username or username',
+      usernamePlaceholder: 'username or phone number',
       profileId: 'Profile ID',
       profileIdPlaceholder: 'john-doe-123456',
       channelHandle: 'Channel Handle',
