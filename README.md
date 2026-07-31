@@ -1,126 +1,132 @@
+<p align="center">
+  <img src="public/logo.svg" alt="QR Code Builder" width="120" />
+</p>
+
 # QR Code Builder
 
-A modern, customizable QR code builder built with React, TypeScript, and Vite. Features a beautiful dark/light theme, persistent settings, and multiple export formats.
+A modern, fully customizable QR code builder built with React, TypeScript, and Vite. Generate styled QR codes for 19 content types, personalize every detail, localize the UI, and export to PNG, SVG, or PDF — all client-side, no account required.
 
-🌐 **Live Demo:** [https://free-qr-builder.netlify.app](https://free-qr-builder.netlify.app)
-
-![QR Code Builder](https://via.placeholder.com/800x400?text=QR+Code+Builder)
+🌐 **Live demo:** [https://free-qr-builder.netlify.app](https://free-qr-builder.netlify.app)
 
 ## ✨ Features
 
-- **Fully Customizable QR Codes**
-  - Adjust size (100-500px) and margin
-  - Choose from 6 dot styles (square, dots, rounded, extra-rounded, classy, classy-rounded)
-  - Select corner square and corner dot styles
-  - Solid colors or gradients for dots
+- **19 content templates**, grouped by category:
+  - **Links & utilities** — URL, WiFi credentials, calendar event, geo location
+  - **Contact & messaging** — vCard, email, SMS, phone call, WhatsApp, Telegram
+  - **Social** — Instagram, Twitter/X, LinkedIn, TikTok, YouTube, Facebook, Snapchat
+  - **Payment** — PayPal, Bitcoin
+  - Each template renders a dedicated form and builds a spec-compliant payload (e.g. `WIFI:`, `BEGIN:VCARD`, `BEGIN:VEVENT`, `geo:`, `bitcoin:`), with proper escaping/encoding.
+
+- **International phone input** — dialing-code selector with country flags (powered by `libphonenumber-js`) for phone, SMS, and WhatsApp templates.
+
+- **Multi-language UI** — English, Italiano, and Română, switchable from the header.
+
+- **Fully customizable styling**
+  - Adjustable size (100–500px) and margin
+  - 6 dot styles (square, rounded, dots, classy, classy-rounded, extra-rounded)
+  - Independent corner-square and corner-dot styles
+  - Solid color or linear/radial gradient for dots
   - Transparent or colored background
+  - **Color presets** (Classic, Ocean, Forest, Sunset, Purple, Monochrome) plus your own saved presets
 
-- **Center Logo Support**
-  - Upload custom logo images
-  - Adjustable size (20-30% of QR code)
-  - Configurable margin around logo
+- **Center logo support** — upload a custom image, tune its size and the margin around it.
 
-- **Error Correction Levels**
-  - L, M, Q, H levels with helpful tooltips
-  - Higher levels recommended when using logos
+- **Error correction levels** — L, M, Q, H with inline guidance (higher levels recommended when embedding a logo).
 
-- **Multiple Export Formats**
-  - PNG for general use
-  - SVG for scalable graphics
-  - PDF for print-ready output
+- **Multiple export formats** — PNG for general use, SVG for scalable graphics, PDF for print-ready output.
 
-- **Modern UI/UX**
-  - Dark/Light theme toggle
-  - Settings persistence via localStorage
-  - Reset to default functionality
-  - Visual style pickers with previews
-  - Responsive design for mobile and desktop
+- **Modern UX** — dark/light theme toggle (dark by default), settings and presets persisted in `localStorage`, reset-to-default, visual style pickers with SVG previews, responsive layout for mobile and desktop.
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- npm or yarn
+- Node.js 22+
+- npm
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/qr-code-builder.git
+git clone https://github.com/davide-pi/qr-code-builder.git
 cd qr-code-builder
 
 # Install dependencies
 npm install
 
-# Start development server
+# Start the development server
 npm run dev
 ```
 
-### Build for Production
+### Build for production
 
 ```bash
 npm run build
-npm run preview  # Preview the production build
+npm run preview  # Preview the production build locally
 ```
 
 ## 🛠️ Tech Stack
 
-- **React 19** - UI framework
-- **TypeScript** - Type safety
-- **Vite 7** - Build tool and dev server
-- **qr-code-styling** - QR code generation library
-- **jsPDF** - PDF export functionality
+- **React 19** — UI framework
+- **TypeScript** — type safety
+- **Vite 8** — build tool and dev server
+- **qr-code-styling** — QR code generation and styling
+- **jsPDF** — PDF export
+- **libphonenumber-js** + **flag-icons** — international dialing codes and flags
+- **lucide-react** — icons
+- **react-select** — accessible dropdowns
 
 ## 📁 Project Structure
 
 ```
 src/
 ├── components/
-│   ├── Header/
-│   │   ├── Header.tsx      # Fixed header with logo and theme toggle
-│   │   └── Header.css
-│   ├── Footer/
-│   │   ├── Footer.tsx      # Fixed footer with credits
-│   │   └── Footer.css
-│   ├── QRCodeGenerator/
-│   │   ├── QRCodeGenerator.tsx  # Main orchestrator component
-│   │   └── QRCodeGenerator.css
-│   ├── QROptions/
-│   │   ├── QROptions.tsx   # All customization controls
-│   │   └── QROptions.css
-│   ├── QRPreview/
-│   │   ├── QRPreview.tsx   # QR preview and download buttons
-│   │   └── QRPreview.css
-│   └── StylePicker/
-│       └── StylePicker.tsx # Reusable style picker with SVG previews
+│   ├── Header/              # App header (logo, theme toggle, language switch)
+│   ├── Footer/              # Footer with credits
+│   ├── QRCodeGenerator/     # Main orchestrator component
+│   ├── QRDataInput/         # Content-type templates and their forms
+│   ├── QROptions/           # Styling controls (size, colors, dots, gradient, logo…)
+│   ├── QRPreview/           # Live preview and PNG/SVG/PDF export
+│   ├── StylePicker/         # Reusable style picker with SVG previews
+│   ├── CountryCodeSelect/   # International dialing-code selector
+│   └── Flags/               # Flag icons for the country selector
+├── i18n/                    # Localization (en, it, ro) and LanguageProvider
 ├── types/
-│   └── qr.ts               # Shared types and constants
-├── App.tsx/css             # Main app with theme logic
-└── main.tsx                # Entry point
+│   └── qr.ts                # Shared types, template definitions, presets, constants
+├── App.tsx / App.css        # Root app and theme logic
+└── main.tsx                 # Entry point
 ```
 
 ## 🌐 Deployment
 
-This project is configured for easy deployment to Netlify:
+The app deploys to **Netlify** through the GitHub Actions pipeline in
+[`.github/workflows/build-and-deploy.yml`](.github/workflows/build-and-deploy.yml):
 
-1. Connect your GitHub repository to Netlify
-2. Netlify will automatically detect Vite configuration
-3. Build command: `npm run build`
-4. Publish directory: `dist`
+1. **Lint** → **Build** (versioned with [GitVersion](https://gitversion.net/)).
+2. **Preview deploy** — every push to `main` publishes a Netlify **draft** deploy.
+3. **Production deploy** — pushing a `vX.Y.Z` tag publishes to production.
+4. **Cleanup** — after an official (tagged) release, an automated step prunes old Netlify
+   deploys, keeping the **last 3 production releases** and only the **latest preview**.
+
+The pipeline expects two repository secrets: `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID`.
+
+> An MCP server for Netlify is configured in [`.mcp.json`](.mcp.json) for use with
+> MCP-compatible AI tooling.
 
 ## 📝 Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+- `npm run dev` — start the development server
+- `npm run build` — type-check and build for production
+- `npm run preview` — preview the production build
+- `npm run lint` — run ESLint
 
 ## 📄 License
 
-MIT License - feel free to use this project for personal or commercial purposes.
+MIT License © 2025 Davide Piccinini — free to use for personal or commercial purposes. See [LICENSE](LICENSE).
 
 ## 🙏 Credits
 
-- [qr-code-styling](https://github.com/kozakdenys/qr-code-styling) - QR code generation
-- [jsPDF](https://github.com/parallax/jsPDF) - PDF export
+- [qr-code-styling](https://github.com/kozakdenys/qr-code-styling) — QR code generation
+- [jsPDF](https://github.com/parallax/jsPDF) — PDF export
+- [libphonenumber-js](https://github.com/catamphetamine/libphonenumber-js) — phone number handling
+- [lucide](https://lucide.dev/) — icons
