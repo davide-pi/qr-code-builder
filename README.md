@@ -69,7 +69,7 @@ npm run preview  # Preview the production build locally
 
 - **React 19** — UI framework
 - **TypeScript** — type safety
-- **Vite 7** — build tool and dev server
+- **Vite 8** — build tool and dev server
 - **qr-code-styling** — QR code generation and styling
 - **jsPDF** — PDF export
 - **libphonenumber-js** + **flag-icons** — international dialing codes and flags
