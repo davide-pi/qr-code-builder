@@ -99,14 +99,18 @@ src/
 
 ## 🌐 Deployment
 
-The app deploys to **Netlify** through the GitHub Actions pipeline in
-[`.github/workflows/build-and-deploy.yml`](.github/workflows/build-and-deploy.yml):
+The app deploys to **Netlify** through a two-stage GitHub Actions pipeline:
 
-1. **Lint** → **Build** (versioned with [GitVersion](https://gitversion.net/)).
-2. **Preview deploy** — every push to `main` publishes a Netlify **draft** deploy.
-3. **Production deploy** — pushing a `vX.Y.Z` tag publishes to production.
-4. **Cleanup** — after an official (tagged) release, an automated step prunes old Netlify
-   deploys, keeping the **last 3 production releases** and only the **latest preview**.
+1. **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) — **Lint** → **Build**
+   (versioned with [GitVersion](https://gitversion.net/)). It uploads the built `dist/` and
+   the deploy metadata as artifacts; no rebuild happens downstream.
+2. **CD** ([`.github/workflows/cd.yml`](.github/workflows/cd.yml)) — triggered by a
+   successful CI (`workflow_run`) and reuses its artifacts:
+   - **Preview deploy** — every push to `main` publishes a Netlify **draft** deploy.
+   - **Production deploy** — pushing a `vX.Y.Z` tag publishes to production.
+   - **Cleanup** — after each deploy an automated step prunes old Netlify deploys, always
+     keeping the **latest 3 production** and **2 preview** deploys, plus every deploy
+     younger than **7 days**.
 
 The pipeline expects two repository secrets: `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID`.
 
