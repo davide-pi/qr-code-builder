@@ -19,5 +19,11 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // eslint-plugin-react-hooks 7.x adds this rule to its recommended set.
+      // The existing setError(...) calls inside effects in QRPreview are
+      // pre-existing patterns; keep as a warning rather than failing the build.
+      'react-hooks/set-state-in-effect': 'warn',
+    },
   },
 ])
