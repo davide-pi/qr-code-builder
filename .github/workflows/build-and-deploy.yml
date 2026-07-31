@@ -163,13 +163,13 @@ jobs:
 
           # IDs to delete:
           #  - production (draft=false, ready) beyond the newest $KEEP_STABLE
-          #  - previews (draft=true) beyond the newest $KEEP_PREVIEW
+          #  - previews (draft=true, ready) beyond the newest $KEEP_PREVIEW
           ids="$(printf '%s' "$deploys" | jq -r \
             --argjson keep_stable "$KEEP_STABLE" \
             --argjson keep_preview "$KEEP_PREVIEW" '
             ( [ .[] | select(.draft == false and .state == "ready") ]
                 | sort_by(.created_at) | reverse | .[$keep_stable:] | .[].id ),
-            ( [ .[] | select(.draft == true) ]
+            ( [ .[] | select(.draft == true and .state == "ready") ]
                 | sort_by(.created_at) | reverse | .[$keep_preview:] | .[].id )
           ')"
 
@@ -177,7 +177,8 @@ jobs:
 
           while IFS= read -r id; do
             [ -n "$id" ] || continue
-            code="$(curl -sS -o /dev/null -w '%{http_code}' -X DELETE -H "$auth" "$api/deploys/${id}")"
+            # `|| echo 000` so a network-level curl failure doesn't trip errexit and abort the loop
+            code="$(curl -sS -o /dev/null -w '%{http_code}' -X DELETE -H "$auth" "$api/deploys/${id}" || echo 000)"
             if [ "$code" = "200" ] || [ "$code" = "204" ]; then
               echo "Deleted $id"
             else
