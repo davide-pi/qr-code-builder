@@ -1,27 +1,55 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { ColorPreset, GradientConfig, QROptions, QRTemplateType } from '../../types/qr';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { createDefaultFormData, evaluateTemplate, isTemplateType } from '../../templates';
+import type {
+  ColorPreset, GradientConfig, QROptions, QRTemplateData, QRTemplateType, TemplateFormData,
+} from '../../types/qr';
 import { defaultQROptions, STORAGE_KEY } from '../../types/qr';
 import QRDataInput from '../QRDataInput/QRDataInput';
 import QROptionsPanel from '../QROptions/QROptions';
 import QRPreview from '../QRPreview/QRPreview';
+import {
+  canRedo, canUndo, createHistory, historyReducer, type HistoryState,
+} from './history';
 import './QRCodeGenerator.css';
 
-const MAX_HISTORY = 50;
+// Debounce shared by the QR preview and the history: typing renders the QR and adds an
+// undo step only once the user pauses
+const DEBOUNCE_MS = 500;
+
+// Everything undo/redo restores. `forms` lives in memory only: it holds personal data
+// (Wi-Fi passwords, locations, contacts…) and is never persisted.
+interface EditorState {
+  options: QROptions;
+  forms: TemplateFormData;
+}
 
 // Persist only the styling: the encoded data may hold sensitive values (WiFi password,
-// geo coordinates) and the template form is not persisted, so it always restarts empty
-const toPersistableOptions = (options: QROptions): Omit<QROptions, 'data'> => {
+// geo coordinates), the template form is not persisted, so it always restarts empty, and
+// the logo (a data URL) can exceed the localStorage quota
+const toPersistableOptions = (options: QROptions): Omit<QROptions, 'data' | 'image'> => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data, ...styling } = options;
+  const { data, image, ...styling } = options;
   return styling;
 };
+
+const isValidColorStops = (stops: unknown): stops is GradientConfig['colorStops'] =>
+  Array.isArray(stops) &&
+  stops.length === 2 &&
+  stops.every((stop) => typeof stop?.offset === 'number' && typeof stop?.color === 'string');
+
+// Merge a saved gradient with the defaults so fields added later are never undefined
+const mergeGradient = (saved: Partial<GradientConfig> | undefined): GradientConfig => ({
+  ...defaultQROptions.dotGradient,
+  ...saved,
+  colorStops: isValidColorStops(saved?.colorStops) ? saved.colorStops : defaultQROptions.dotGradient.colorStops,
+});
 
 // Load saved options from localStorage
 const loadSavedOptions = (): QROptions => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved);
+      const parsed: Partial<QROptions> = JSON.parse(saved);
       // Migrate old imageSize if outside new range (0.1-0.3)
       if (parsed.imageSize !== undefined) {
         // If it was in pixels (>1), convert back to percentage
@@ -32,7 +60,15 @@ const loadSavedOptions = (): QROptions => {
         parsed.imageSize = Math.max(0.1, Math.min(0.3, parsed.imageSize));
       }
       // Merge with defaults to ensure new fields are included
-      return { ...defaultQROptions, ...parsed };
+      return {
+        ...defaultQROptions,
+        ...parsed,
+        dotGradient: mergeGradient(parsed.dotGradient),
+        templateType: isTemplateType(parsed.templateType) ? parsed.templateType : defaultQROptions.templateType,
+        // Never restored: older versions may have stored them
+        data: '',
+        image: '',
+      };
     }
   } catch {
     console.warn('Failed to load saved QR settings');
@@ -40,79 +76,58 @@ const loadSavedOptions = (): QROptions => {
   return defaultQROptions;
 };
 
+const createEditorHistory = (): HistoryState<EditorState> =>
+  createHistory({ options: loadSavedOptions(), forms: createDefaultFormData() });
+
+// Ctrl+Z / Ctrl+Y inside a text control belong to the browser's own undo of that control
+const isEditableTarget = (target: EventTarget | null): boolean =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+
 export default function QRCodeGenerator() {
-  const [options, setOptions] = useState<QROptions>(loadSavedOptions);
-  const [debouncedData, setDebouncedData] = useState(options.data);
-  const [history, setHistory] = useState<QROptions[]>(() => [loadSavedOptions()]);
-  const [historyIndex, setHistoryIndex] = useState(0);
-  const isUndoRedoRef = useRef(false);
-  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [history, dispatch] = useReducer(historyReducer<EditorState>, undefined, createEditorHistory);
+  const editor = history.current;
+  const { options, forms } = editor;
+  const { templateType } = options;
 
-  // Debounce data changes for QR generation
+  // Validate the selected form and build the text to encode. Invalid data encodes nothing
+  // (the preview then shows its empty state) while the form shows the errors.
+  const formData = forms[templateType];
+  const { errors, payload } = useMemo(() => evaluateTemplate(templateType, formData), [templateType, formData]);
+
+  const [debouncedData, setDebouncedData] = useState(payload);
+
+  // Debounce payload changes for QR generation
   useEffect(() => {
-    // Clear existing timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
+    const timer = setTimeout(() => setDebouncedData(payload), DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [payload]);
 
-    // Set new timer to update debounced data after 1 second
-    debounceTimerRef.current = setTimeout(() => {
-      setDebouncedData(options.data);
-    }, 500);
+  // Commit the pending edits to the history once the user pauses
+  useEffect(() => {
+    const timer = setTimeout(() => dispatch({ type: 'commit' }), DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [editor]);
 
-    // Cleanup on unmount or when data changes
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, [options.data]);
-
-  // Save options to localStorage whenever they change
+  // Save the styling to localStorage whenever it changes (typing does not touch `options`)
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(toPersistableOptions(options)));
     } catch {
       console.warn('Failed to save QR settings');
     }
-
-    // Add to history if not from undo/redo
-    if (!isUndoRedoRef.current) {
-      setHistoryIndex(currentIndex => {
-        setHistory(prev => {
-          const newHistory = prev.slice(0, currentIndex + 1);
-          newHistory.push(options);
-          if (newHistory.length > MAX_HISTORY) newHistory.shift();
-          return newHistory;
-        });
-        return Math.min(currentIndex + 1, MAX_HISTORY - 1);
-      });
-    }
-    isUndoRedoRef.current = false;
   }, [options]);
 
-  const canUndo = historyIndex > 0;
-  const canRedo = historyIndex < history.length - 1;
+  const undoable = canUndo(history);
+  const redoable = canRedo(history);
 
-  const undo = useCallback(() => {
-    if (canUndo) {
-      isUndoRedoRef.current = true;
-      setHistoryIndex(prev => prev - 1);
-      setOptions(history[historyIndex - 1]);
-    }
-  }, [canUndo, history, historyIndex]);
-
-  const redo = useCallback(() => {
-    if (canRedo) {
-      isUndoRedoRef.current = true;
-      setHistoryIndex(prev => prev + 1);
-      setOptions(history[historyIndex + 1]);
-    }
-  }, [canRedo, history, historyIndex]);
+  const undo = useCallback(() => dispatch({ type: 'undo' }), []);
+  const redo = useCallback(() => dispatch({ type: 'redo' }), []);
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isEditableTarget(e.target)) return;
       const key = e.key.toLowerCase();
       // Redo: Ctrl+Shift+Z or Ctrl+Y
       if ((e.ctrlKey || e.metaKey) && ((key === 'z' && e.shiftKey) || key === 'y')) {
@@ -128,14 +143,24 @@ export default function QRCodeGenerator() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
 
+  const setOptions = useCallback((update: (prev: QROptions) => QROptions) => {
+    dispatch({
+      type: 'edit',
+      update: (state) => {
+        const next = update(state.options);
+        return next === state.options ? state : { ...state, options: next };
+      },
+    });
+  }, []);
+
   // Update template type
   const updateTemplateType = (type: QRTemplateType) => {
-    setOptions((prev) => ({ ...prev, templateType: type }));
+    setOptions((prev) => (prev.templateType === type ? prev : { ...prev, templateType: type }));
   };
 
-  // Update data from template forms
-  const updateData = (data: string) => {
-    setOptions((prev) => ({ ...prev, data }));
+  // Update the form data of a template
+  const updateFormData = (type: QRTemplateType, data: QRTemplateData) => {
+    dispatch({ type: 'edit', update: (state) => ({ ...state, forms: { ...state.forms, [type]: data } }) });
   };
 
   // Update a single option
@@ -211,8 +236,9 @@ export default function QRCodeGenerator() {
     }));
   };
 
+  // Restores the styling and clears every template form
   const resetToDefault = useCallback(() => {
-    setOptions(defaultQROptions);
+    dispatch({ type: 'reset', state: { options: defaultQROptions, forms: createDefaultFormData() } });
     setDebouncedData(defaultQROptions.data); // Also reset debounced data immediately
   }, []);
 
@@ -232,9 +258,11 @@ export default function QRCodeGenerator() {
   return (
     <div className="qr-generator">
       <QRDataInput
-        templateType={options.templateType}
+        templateType={templateType}
+        data={formData}
+        errors={errors}
         onTemplateChange={updateTemplateType}
-        onDataChange={updateData}
+        onDataChange={(data) => updateFormData(templateType, data)}
       />
       <QRPreview options={previewOptions} />
       <QROptionsPanel
@@ -245,8 +273,8 @@ export default function QRCodeGenerator() {
         onApplyPreset={applyPreset}
         onUndo={undo}
         onRedo={redo}
-        canUndo={canUndo}
-        canRedo={canRedo}
+        canUndo={undoable}
+        canRedo={redoable}
         onResetToDefault={resetToDefault}
       />
     </div>

@@ -141,6 +141,13 @@
   background: var(--card-bg-secondary);
 }
 
+/* Option highlighted with the keyboard (aria-activedescendant) */
+.template-dropdown-item.active {
+  background: var(--card-bg-secondary);
+  outline: 2px solid var(--input-focus-border);
+  outline-offset: -2px;
+}
+
 .template-dropdown-item.selected {
   background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
   color: #ffffff;
@@ -200,6 +207,18 @@
 .form-group textarea {
   resize: vertical;
   font-family: inherit;
+}
+
+/* Inline validation */
+.form-group input[aria-invalid="true"],
+.form-group textarea[aria-invalid="true"] {
+  border-color: #ef4444;
+}
+
+.field-error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #ef4444;
 }
 
 .form-row {

@@ -11,7 +11,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "flag-icons": "^7.5.0",
@@ -35,6 +36,7 @@
     "globals": "^16.5.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.65.0",
-    "vite": "^8.1.4"
+    "vite": "^8.1.4",
+    "vitest": "^5.0.4"
   }
 }

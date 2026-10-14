@@ -15,7 +15,7 @@ export type QRTemplateType =
   // Social
   | 'instagram' | 'twitter' | 'linkedin' | 'tiktok' | 'youtube' | 'facebook' | 'snapchat'
   // Payment
-  | 'paypal' | 'bitcoin'
+  | 'paypal' | 'bitcoin' | 'epc'
   // Utilities
   | 'wifi' | 'calendar' | 'location';
 
@@ -99,20 +99,54 @@ export interface SocialMediaData {
 // PayPal Data
 export interface PayPalData {
   username: string;
-  amount?: string;
-  currency?: string;
+  amount: string;
+  currency: string;
 }
 
 // Bitcoin Data
 export interface BitcoinData {
   address: string;
-  amount?: string;
-  label?: string;
+  amount: string;
+  label: string;
 }
 
-export type QRTemplateData =
-  | URLData | VCardData | WiFiData | EmailData | SMSData | CalendarData | LocationData
-  | PhoneData | WhatsAppData | TelegramData | SocialMediaData | PayPalData | BitcoinData;
+// SEPA credit transfer (EPC069-12 "Girocode")
+export interface EPCData {
+  name: string;
+  iban: string;
+  bic: string;
+  amount: string;
+  remittance: string;
+}
+
+// Form data type of every template, keyed by template type
+export interface TemplateDataMap {
+  url: URLData;
+  vcard: VCardData;
+  wifi: WiFiData;
+  email: EmailData;
+  sms: SMSData;
+  calendar: CalendarData;
+  location: LocationData;
+  phone: PhoneData;
+  whatsapp: WhatsAppData;
+  telegram: TelegramData;
+  instagram: SocialMediaData;
+  twitter: SocialMediaData;
+  linkedin: SocialMediaData;
+  tiktok: SocialMediaData;
+  youtube: SocialMediaData;
+  facebook: SocialMediaData;
+  snapchat: SocialMediaData;
+  paypal: PayPalData;
+  bitcoin: BitcoinData;
+  epc: EPCData;
+}
+
+export type QRTemplateData = TemplateDataMap[QRTemplateType];
+
+// In-memory form state of every template (never persisted: it holds personal data)
+export type TemplateFormData = { [K in QRTemplateType]: TemplateDataMap[K] };
 
 export interface GradientConfig {
   enabled: boolean;
@@ -213,18 +247,18 @@ export const defaultSMSData: SMSData = {
   message: '',
 };
 
-// Helper to get current datetime in format for datetime-local input
-const getCurrentDateTime = (): string => {
-  const now = new Date();
-  // Format: YYYY-MM-DDTHH:MM
-  return now.toISOString().slice(0, 16);
+// Format a date as YYYY-MM-DDTHH:MM in LOCAL time, as expected by datetime-local inputs
+// (toISOString would shift it to UTC)
+const toLocalDateTime = (date: Date): string => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
+// Helper to get current datetime in format for datetime-local input
+const getCurrentDateTime = (): string => toLocalDateTime(new Date());
+
 // Helper to get datetime 1 hour from now
-const getOneHourLater = (): string => {
-  const later = new Date(Date.now() + 60 * 60 * 1000);
-  return later.toISOString().slice(0, 16);
-};
+const getOneHourLater = (): string => toLocalDateTime(new Date(Date.now() + 60 * 60 * 1000));
 
 export const getDefaultCalendarData = (): CalendarData => ({
   title: '',
@@ -273,42 +307,13 @@ export const defaultBitcoinData: BitcoinData = {
   label: '',
 };
 
-// Template definition with categories
-export interface TemplateDefinition {
-  type: QRTemplateType;
-  label: string;
-  category: TemplateCategory;
-  description: string;
-}
-
-export const templateDefinitions: TemplateDefinition[] = [
-  // Links
-  { type: 'url', label: 'URL', category: 'links', description: 'Website or link' },
-  // Contact & Messaging
-  { type: 'vcard', label: 'vCard', category: 'contact', description: 'Contact card' },
-  { type: 'email', label: 'Email', category: 'contact', description: 'Email message' },
-  { type: 'sms', label: 'SMS', category: 'contact', description: 'Text message' },
-  { type: 'phone', label: 'Phone', category: 'contact', description: 'Phone call' },
-  { type: 'whatsapp', label: 'WhatsApp', category: 'contact', description: 'WhatsApp message' },
-  { type: 'telegram', label: 'Telegram', category: 'contact', description: 'Telegram profile' },
-  // Social
-  { type: 'instagram', label: 'Instagram', category: 'social', description: 'Instagram profile' },
-  { type: 'twitter', label: 'Twitter/X', category: 'social', description: 'Twitter profile' },
-  { type: 'linkedin', label: 'LinkedIn', category: 'social', description: 'LinkedIn profile' },
-  { type: 'tiktok', label: 'TikTok', category: 'social', description: 'TikTok profile' },
-  { type: 'youtube', label: 'YouTube', category: 'social', description: 'YouTube channel' },
-  { type: 'facebook', label: 'Facebook', category: 'social', description: 'Facebook page' },
-  { type: 'snapchat', label: 'Snapchat', category: 'social', description: 'Snapchat profile' },
-  // Payment
-  { type: 'paypal', label: 'PayPal', category: 'payment', description: 'PayPal payment' },
-  { type: 'bitcoin', label: 'Bitcoin', category: 'payment', description: 'Bitcoin address' },
-  // Utilities (shown in 'all' or could add 'utilities' category)
-  { type: 'wifi', label: 'WiFi', category: 'links', description: 'WiFi credentials' },
-  { type: 'calendar', label: 'Event', category: 'links', description: 'Calendar event' },
-  { type: 'location', label: 'Location', category: 'links', description: 'Geo location' },
-];
-
-
+export const defaultEPCData: EPCData = {
+  name: '',
+  iban: '',
+  bic: '',
+  amount: '',
+  remittance: '',
+};
 
 export const dotTypes: DotType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded'];
 export const cornerSquareTypes: CornerSquareType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded', 'dot'];

@@ -42,6 +42,7 @@ export interface Translations {
       snapchat: string;
       paypal: string;
       bitcoin: string;
+      epc: string;
     };
     // Form labels
     form: {
@@ -102,6 +103,32 @@ export interface Translations {
       bitcoinAddress: string;
       bitcoinAddressPlaceholder: string;
       amountBtc: string;
+      encryptionNone: string;
+      beneficiaryName: string;
+      iban: string;
+      ibanPlaceholder: string;
+      bic: string;
+      bicPlaceholder: string;
+      amountEur: string;
+      remittanceText: string;
+    };
+    // Inline validation messages
+    errors: {
+      required: string;
+      nameOrOrganizationRequired: string;
+      invalidUrl: string;
+      invalidEmail: string;
+      invalidPhone: string;
+      invalidLatitude: string;
+      invalidLongitude: string;
+      invalidAmount: string;
+      invalidHandle: string;
+      invalidBitcoinAddress: string;
+      endBeforeStart: string;
+      invalidIban: string;
+      invalidBic: string;
+      amountOutOfRange: string;
+      tooLong: string;
     };
   };
 
