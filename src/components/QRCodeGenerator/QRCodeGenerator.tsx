@@ -8,6 +8,13 @@ import './QRCodeGenerator.css';
 
 const MAX_HISTORY = 50;
 
+// Templates whose encoded data holds sensitive values (WiFi password, geo coordinates)
+const SENSITIVE_TEMPLATES: QRTemplateType[] = ['wifi', 'location'];
+
+// Strip sensitive encoded data before persisting to localStorage
+const toPersistableOptions = (options: QROptions): QROptions =>
+  SENSITIVE_TEMPLATES.includes(options.templateType) ? { ...options, data: '' } : options;
+
 // Load saved options from localStorage
 const loadSavedOptions = (): QROptions => {
   try {
@@ -63,7 +70,7 @@ export default function QRCodeGenerator() {
   // Save options to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(options));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toPersistableOptions(options)));
     } catch {
       console.warn('Failed to save QR settings');
     }
