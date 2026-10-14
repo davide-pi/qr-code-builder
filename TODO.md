@@ -14,7 +14,7 @@ Branch di lavoro: `feature/project-refresh` (worktree `C:\__Workspaces\github\qr
 
 ## Prossimi passi, in ordine
 
-1. [ ] Verificare il merge: in `base` → `npm ci && npm run lint && npm run build`.
+1. [x] Verificare il merge: in `base` → `npm ci && npm run lint && npm run build` → lint ok, build ok, bundle principale 330 kB (era 892), precache PWA 1,56 MiB (era 5,4).
 2. [ ] In `templates` → `npm ci && npm run lint && npm test && npm run build`; correggere quello che fallisce.
 3. [ ] Mergiare `wip/templates` in feature. Conflitti attesi:
    - `src/types/qr.ts`: options ha spostato `countryCodes` in `CountryCodeSelect/countryCodes.ts` e tolto l'import di libphonenumber; templates ha rimosso le parti dei template.
