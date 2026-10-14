@@ -6,6 +6,8 @@ export interface Translations {
     title: string;
     switchToLight: string;
     switchToDark: string;
+    logoAlt: string;
+    language: string;
   };
 
   // QR Data Input
@@ -120,10 +122,17 @@ export interface Translations {
       colors: string;
       background: string;
       centerLogo: string;
+      presets: string;
     };
     // Error Correction
     errorCorrection: {
       level: string;
+      labels: {
+        L: string;
+        M: string;
+        Q: string;
+        H: string;
+      };
       levels: {
         L: string;
         M: string;
@@ -148,6 +157,15 @@ export interface Translations {
       dotColor: string;
       cornerSquare: string;
       cornerDot: string;
+      applyPreset: string;
+      presetNames: {
+        classic: string;
+        ocean: string;
+        forest: string;
+        sunset: string;
+        purple: string;
+        monochrome: string;
+      };
     };
     // Background
     background: {
@@ -161,6 +179,33 @@ export interface Translations {
       removeLogo: string;
       size: string;
       margin: string;
+      preview: string;
+      ecRaised: string;
+      errors: {
+        invalidType: string;
+        tooLarge: string;
+        readFailed: string;
+      };
+    };
+    // Saved presets
+    presets: {
+      nameLabel: string;
+      namePlaceholder: string;
+      save: string;
+      hint: string;
+      empty: string;
+      list: string;
+      apply: string;
+      delete: string;
+      export: string;
+      import: string;
+      limitReached: string;
+      saved: string;
+      deleted: string;
+      exported: string;
+      imported: string;
+      importError: string;
+      storageError: string;
     };
   };
 
@@ -201,6 +246,7 @@ export interface Translations {
   common: {
     required: string;
     optional: string;
+    selectCountry: string;
   };
 }
 

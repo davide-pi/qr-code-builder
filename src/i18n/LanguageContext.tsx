@@ -19,9 +19,13 @@ const detectBrowserLanguage = (): Language => {
 
 // Get initial language from localStorage or browser
 const getInitialLanguage = (): Language => {
-  const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-  if (stored === 'en' || stored === 'it' || stored === 'ro') {
-    return stored;
+  try {
+    const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (stored === 'en' || stored === 'it' || stored === 'ro') {
+      return stored;
+    }
+  } catch {
+    // Storage unavailable (e.g. private mode): fall back to the browser language
   }
   return detectBrowserLanguage();
 };
@@ -35,7 +39,11 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    } catch {
+      // Storage unavailable: the choice only lasts for this session
+    }
     document.documentElement.lang = lang;
   };
 

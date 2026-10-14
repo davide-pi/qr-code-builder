@@ -6,6 +6,8 @@ export const ro: Translations = {
     title: 'Generator Cod QR',
     switchToLight: 'Comută la tema deschisă',
     switchToDark: 'Comută la tema închisă',
+    logoAlt: 'Logo generator cod QR',
+    language: 'Limba',
   },
 
   // QR Data Input
@@ -116,9 +118,16 @@ export const ro: Translations = {
       colors: 'Culori',
       background: 'Fundal',
       centerLogo: 'Logo Central',
+      presets: 'Presetările mele',
     },
     errorCorrection: {
       level: 'Nivel',
+      labels: {
+        L: 'Scăzut (L)',
+        M: 'Mediu (M)',
+        Q: 'Quartilă (Q)',
+        H: 'Ridicat (H)',
+      },
       levels: {
         L: '~7% recuperare daune. Ideal pentru medii curate.',
         M: '~15% recuperare daune. Echilibru bun între dimensiune și fiabilitate.',
@@ -141,6 +150,15 @@ export const ro: Translations = {
       dotColor: 'Culoare Puncte',
       cornerSquare: 'Pătratul colțului',
       cornerDot: 'Punctul colțului',
+      applyPreset: 'Aplică presetarea de culori {name}',
+      presetNames: {
+        classic: 'Clasic',
+        ocean: 'Ocean',
+        forest: 'Pădure',
+        sunset: 'Apus',
+        purple: 'Violet',
+        monochrome: 'Monocrom',
+      },
     },
     background: {
       transparent: 'Fundal Transparent',
@@ -152,6 +170,33 @@ export const ro: Translations = {
       removeLogo: 'Elimină logo',
       size: 'Dimensiune',
       margin: 'Margine',
+      preview: 'Previzualizare logo',
+      ecRaised: 'Corecția erorilor a fost ridicată la Ridicat (H) pentru ca logo-ul să nu împiedice scanarea.',
+      errors: {
+        invalidType: 'Fișier neacceptat. Folosește o imagine PNG, JPEG, WebP sau SVG.',
+        tooLarge: 'Imaginea este prea mare. Dimensiunea maximă este 2 MB.',
+        readFailed: 'Imaginea nu a putut fi citită.',
+      },
+    },
+    // Saved presets
+    presets: {
+      nameLabel: 'Numele presetării',
+      namePlaceholder: 'Presetarea mea',
+      save: 'Salvează stilul curent',
+      hint: 'Salvează doar culorile, gradientul și formele, niciodată conținutul codului QR sau logo-ul.',
+      empty: 'Nicio presetare salvată.',
+      list: 'Presetări salvate',
+      apply: 'Aplică presetarea {name}',
+      delete: 'Șterge presetarea {name}',
+      export: 'Exportă',
+      import: 'Importă',
+      limitReached: 'Poți salva cel mult {max} presetări.',
+      saved: 'Presetarea "{name}" a fost salvată.',
+      deleted: 'Presetarea "{name}" a fost ștearsă.',
+      exported: 'Presetări exportate.',
+      imported: '{count} presetări importate.',
+      importError: 'Fișier de presetări invalid.',
+      storageError: 'Presetările nu pot fi stocate în acest browser; se vor pierde la reîncărcare.',
     },
   },
 
@@ -192,5 +237,6 @@ export const ro: Translations = {
   common: {
     required: 'obligatoriu',
     optional: 'opțional',
+    selectCountry: 'Selectează țara...',
   },
 };
