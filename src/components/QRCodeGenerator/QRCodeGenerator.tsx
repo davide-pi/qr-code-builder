@@ -8,15 +8,12 @@ import './QRCodeGenerator.css';
 
 const MAX_HISTORY = 50;
 
-// Templates whose encoded data holds sensitive values (WiFi password, geo coordinates)
-const SENSITIVE_TEMPLATES: QRTemplateType[] = ['wifi', 'location'];
-
-// Strip sensitive encoded data before persisting to localStorage
-const toPersistableOptions = (options: QROptions): Partial<QROptions> => {
-  if (!SENSITIVE_TEMPLATES.includes(options.templateType)) return options;
-  const persistable: Partial<QROptions> = { ...options };
-  delete persistable.data;
-  return persistable;
+// Persist only the styling: the encoded data may hold sensitive values (WiFi password,
+// geo coordinates) and the template form is not persisted, so it always restarts empty
+const toPersistableOptions = (options: QROptions): Omit<QROptions, 'data'> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { data, ...styling } = options;
+  return styling;
 };
 
 // Load saved options from localStorage
