@@ -1,5 +1,4 @@
 import type { DotType, CornerSquareType, CornerDotType, GradientType, ErrorCorrectionLevel } from 'qr-code-styling';
-import { getCountries, getCountryCallingCode, type CountryCode } from 'libphonenumber-js';
 
 // Template Categories
 export type TemplateCategory = 'all' | 'links' | 'contact' | 'social' | 'payment';
@@ -314,56 +313,27 @@ export const dotTypes: DotType[] = ['square', 'rounded', 'dots', 'classy', 'clas
 export const cornerSquareTypes: CornerSquareType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded', 'dot'];
 export const cornerDotTypes: CornerDotType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded', 'dot'];
 export const gradientTypes: GradientType[] = ['linear', 'radial'];
-export const errorCorrectionLevels: { value: ErrorCorrectionLevel; label: string; description: string }[] = [
-  { value: 'L', label: 'Low (L)', description: '~7% damage recovery. Best for clean environments.' },
-  { value: 'M', label: 'Medium (M)', description: '~15% damage recovery. Good balance of size and reliability.' },
-  { value: 'Q', label: 'Quartile (Q)', description: '~25% damage recovery. Good for moderate damage resistance.' },
-  { value: 'H', label: 'High (H)', description: '~30% damage recovery. Best when using center logo.' },
-];
-
-// Common country codes for phone numbers (generated from libphonenumber-js)
-const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
-
-// Priority countries to show at the top of the list
-const priorityCountries: CountryCode[] = ['IT', 'US', 'GB', 'DE', 'FR', 'ES'];
-
-const allCountryCodes = getCountries()
-  .map((countryCode) => ({
-    countryCode,
-    code: `+${getCountryCallingCode(countryCode)}`,
-    country: countryNames.of(countryCode) || countryCode,
-  }))
-  .sort((a, b) => a.country.localeCompare(b.country));
-
-// Put priority countries at the top, then the rest alphabetically
-export const countryCodes: { code: string; country: string }[] = [
-  ...priorityCountries
-    .map((cc) => allCountryCodes.find((c) => c.countryCode === cc)!)
-    .filter(Boolean)
-    .map(({ code, country }) => ({ code, country })),
-  ...allCountryCodes
-    .filter((c) => !priorityCountries.includes(c.countryCode))
-    .map(({ code, country }) => ({ code, country })),
-];
+export const errorCorrectionLevels: ErrorCorrectionLevel[] = ['L', 'M', 'Q', 'H'];
 
 // Local storage key
 export const STORAGE_KEY = 'qr-generator-settings';
 export const PRESETS_KEY = 'qr-generator-presets';
 
-// Color presets
+// Color presets (ids are translated in the UI: see qrOptions.colors.presets)
 export interface ColorPreset {
-  name: string;
   dotColor: string;
   cornerSquareColor: string;
   cornerDotColor: string;
   backgroundColor: string;
 }
 
-export const defaultColorPresets: ColorPreset[] = [
-  { name: 'Classic', dotColor: '#000000', cornerSquareColor: '#000000', cornerDotColor: '#000000', backgroundColor: '#ffffff' },
-  { name: 'Ocean', dotColor: '#0077b6', cornerSquareColor: '#023e8a', cornerDotColor: '#03045e', backgroundColor: '#caf0f8' },
-  { name: 'Forest', dotColor: '#2d6a4f', cornerSquareColor: '#1b4332', cornerDotColor: '#081c15', backgroundColor: '#d8f3dc' },
-  { name: 'Sunset', dotColor: '#e63946', cornerSquareColor: '#d62828', cornerDotColor: '#6a040f', backgroundColor: '#fff1e6' },
-  { name: 'Purple', dotColor: '#7b2cbf', cornerSquareColor: '#5a189a', cornerDotColor: '#3c096c', backgroundColor: '#e0aaff' },
-  { name: 'Monochrome', dotColor: '#333333', cornerSquareColor: '#1a1a1a', cornerDotColor: '#000000', backgroundColor: '#f5f5f5' },
+export type ColorPresetId = 'classic' | 'ocean' | 'forest' | 'sunset' | 'purple' | 'monochrome';
+
+export const defaultColorPresets: (ColorPreset & { id: ColorPresetId })[] = [
+  { id: 'classic', dotColor: '#000000', cornerSquareColor: '#000000', cornerDotColor: '#000000', backgroundColor: '#ffffff' },
+  { id: 'ocean', dotColor: '#0077b6', cornerSquareColor: '#023e8a', cornerDotColor: '#03045e', backgroundColor: '#caf0f8' },
+  { id: 'forest', dotColor: '#2d6a4f', cornerSquareColor: '#1b4332', cornerDotColor: '#081c15', backgroundColor: '#d8f3dc' },
+  { id: 'sunset', dotColor: '#e63946', cornerSquareColor: '#d62828', cornerDotColor: '#6a040f', backgroundColor: '#fff1e6' },
+  { id: 'purple', dotColor: '#7b2cbf', cornerSquareColor: '#5a189a', cornerDotColor: '#3c096c', backgroundColor: '#e0aaff' },
+  { id: 'monochrome', dotColor: '#333333', cornerSquareColor: '#1a1a1a', cornerDotColor: '#000000', backgroundColor: '#f5f5f5' },
 ];

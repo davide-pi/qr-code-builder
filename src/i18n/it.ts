@@ -6,6 +6,8 @@ export const it: Translations = {
     title: 'Generatore QR Code',
     switchToLight: 'Passa al tema chiaro',
     switchToDark: 'Passa al tema scuro',
+    logoAlt: 'Logo del generatore di QR Code',
+    language: 'Lingua',
   },
 
   // QR Data Input
@@ -116,9 +118,16 @@ export const it: Translations = {
       colors: 'Colori',
       background: 'Sfondo',
       centerLogo: 'Logo Centrale',
+      presets: 'I Miei Preset',
     },
     errorCorrection: {
       level: 'Livello',
+      labels: {
+        L: 'Bassa (L)',
+        M: 'Media (M)',
+        Q: 'Quartile (Q)',
+        H: 'Alta (H)',
+      },
       levels: {
         L: '~7% recupero danni. Ideale per ambienti puliti.',
         M: '~15% recupero danni. Buon equilibrio tra dimensione e affidabilità.',
@@ -141,6 +150,15 @@ export const it: Translations = {
       dotColor: 'Colore Punti',
       cornerSquare: 'Quadrato Angolare',
       cornerDot: 'Punto Angolare',
+      applyPreset: 'Applica il preset di colori {name}',
+      presetNames: {
+        classic: 'Classico',
+        ocean: 'Oceano',
+        forest: 'Foresta',
+        sunset: 'Tramonto',
+        purple: 'Viola',
+        monochrome: 'Monocromatico',
+      },
     },
     background: {
       transparent: 'Sfondo Trasparente',
@@ -152,6 +170,33 @@ export const it: Translations = {
       removeLogo: 'Rimuovi logo',
       size: 'Dimensione',
       margin: 'Margine',
+      preview: 'Anteprima del logo',
+      ecRaised: 'Correzione errori portata ad Alta (H) perché il logo non ostacoli la lettura.',
+      errors: {
+        invalidType: 'File non supportato. Usa un\'immagine PNG, JPEG, WebP o SVG.',
+        tooLarge: 'L\'immagine è troppo grande. Dimensione massima 2 MB.',
+        readFailed: 'Impossibile leggere l\'immagine.',
+      },
+    },
+    // Saved presets
+    presets: {
+      nameLabel: 'Nome del preset',
+      namePlaceholder: 'Il mio preset',
+      save: 'Salva stile attuale',
+      hint: 'Salva solo colori, gradiente e forme, mai il contenuto del QR o il logo.',
+      empty: 'Nessun preset salvato.',
+      list: 'Preset salvati',
+      apply: 'Applica il preset {name}',
+      delete: 'Elimina il preset {name}',
+      export: 'Esporta',
+      import: 'Importa',
+      limitReached: 'Puoi salvare al massimo {max} preset.',
+      saved: 'Preset "{name}" salvato.',
+      deleted: 'Preset "{name}" eliminato.',
+      exported: 'Preset esportati.',
+      imported: '{count} preset importati.',
+      importError: 'File di preset non valido.',
+      storageError: 'Impossibile salvare i preset in questo browser: andranno persi al ricaricamento.',
     },
   },
 
@@ -180,5 +225,6 @@ export const it: Translations = {
   common: {
     required: 'obbligatorio',
     optional: 'opzionale',
+    selectCountry: 'Seleziona paese...',
   },
 };

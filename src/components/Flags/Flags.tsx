@@ -1,10 +1,14 @@
 import type { Language } from '../../i18n';
+// Only the flags of the UI languages are bundled (small SVGs, inlined as data URIs by Vite)
+import gbFlag from 'flag-icons/flags/4x3/gb.svg';
+import itFlag from 'flag-icons/flags/4x3/it.svg';
+import roFlag from 'flag-icons/flags/4x3/ro.svg';
+import './Flags.css';
 
-// Map language codes to country codes for flag-icons
-const languageToCountry: Record<Language, string> = {
-  en: 'gb',
-  it: 'it',
-  ro: 'ro',
+const flagSources: Record<Language, string> = {
+  en: gbFlag,
+  it: itFlag,
+  ro: roFlag,
 };
 
 interface LanguageFlagProps {
@@ -13,11 +17,11 @@ interface LanguageFlagProps {
 }
 
 export function LanguageFlag({ code, className = '' }: LanguageFlagProps) {
-  const countryCode = languageToCountry[code];
-
   return (
-    <span
-      className={`fi fi-${countryCode} ${className}`.trim()}
+    <img
+      src={flagSources[code]}
+      className={`flag ${className}`.trim()}
+      alt=""
       aria-hidden="true"
     />
   );

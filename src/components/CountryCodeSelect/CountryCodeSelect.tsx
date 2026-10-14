@@ -1,47 +1,30 @@
-import Select, { type SingleValue } from 'react-select';
-import { countryCodes } from '../../types/qr';
-import './CountryCodeSelect.css';
-
-interface CountryOption {
-  value: string;
-  label: string;
-}
+import { lazy, Suspense } from 'react';
+import { useLanguage } from '../../i18n';
 
 interface CountryCodeSelectProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-const countryOptions: CountryOption[] = countryCodes.map(({ code, country }) => ({
-  value: code,
-  label: `${code} ${country}`,
-}));
+// react-select is heavy: load it only when a template with a phone number is shown
+const CountryCodeSelectInner = lazy(() => import('./CountryCodeSelectInner'));
 
-export default function CountryCodeSelect({ value, onChange }: CountryCodeSelectProps) {
-  const selectedOption = countryOptions.find((opt) => opt.value === value) || null;
-
-  const handleChange = (option: SingleValue<CountryOption>) => {
-    if (option) {
-      onChange(option.value);
-    }
-  };
+export default function CountryCodeSelect(props: CountryCodeSelectProps) {
+  const { t } = useLanguage();
 
   return (
-    <Select<CountryOption>
-      value={selectedOption}
-      onChange={handleChange}
-      options={countryOptions}
-      placeholder="Select country..."
-      isSearchable
-      classNamePrefix="country-select"
-      menuPlacement="auto"
-      filterOption={(option, inputValue) => {
-        const searchLower = inputValue.toLowerCase();
-        return (
-          option.label.toLowerCase().includes(searchLower) ||
-          option.value.includes(inputValue)
-        );
-      }}
-    />
+    <Suspense
+      fallback={
+        <select
+          disabled
+          value={props.value}
+          aria-label={t.common.selectCountry}
+        >
+          <option value={props.value}>{props.value}</option>
+        </select>
+      }
+    >
+      <CountryCodeSelectInner {...props} />
+    </Suspense>
   );
 }

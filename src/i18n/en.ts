@@ -6,6 +6,8 @@ export const en: Translations = {
     title: 'QR Code Builder',
     switchToLight: 'Switch to light mode',
     switchToDark: 'Switch to dark mode',
+    logoAlt: 'QR Code logo',
+    language: 'Language',
   },
 
   // QR Data Input
@@ -116,9 +118,16 @@ export const en: Translations = {
       colors: 'Colors',
       background: 'Background',
       centerLogo: 'Center Logo',
+      presets: 'My Presets',
     },
     errorCorrection: {
       level: 'Level',
+      labels: {
+        L: 'Low (L)',
+        M: 'Medium (M)',
+        Q: 'Quartile (Q)',
+        H: 'High (H)',
+      },
       levels: {
         L: '~7% damage recovery. Best for clean environments.',
         M: '~15% damage recovery. Good balance of size and reliability.',
@@ -141,6 +150,15 @@ export const en: Translations = {
       dotColor: 'Dot Color',
       cornerSquare: 'Corner Square',
       cornerDot: 'Corner Dot',
+      applyPreset: 'Apply {name} color preset',
+      presetNames: {
+        classic: 'Classic',
+        ocean: 'Ocean',
+        forest: 'Forest',
+        sunset: 'Sunset',
+        purple: 'Purple',
+        monochrome: 'Monochrome',
+      },
     },
     background: {
       transparent: 'Transparent Background',
@@ -152,6 +170,33 @@ export const en: Translations = {
       removeLogo: 'Remove logo',
       size: 'Size',
       margin: 'Margin',
+      preview: 'Logo preview',
+      ecRaised: 'Error correction raised to High (H) so the logo does not hinder scanning.',
+      errors: {
+        invalidType: 'Unsupported file. Use a PNG, JPEG, WebP or SVG image.',
+        tooLarge: 'The image is too large. Maximum size is 2 MB.',
+        readFailed: 'Could not read the image.',
+      },
+    },
+    // Saved presets
+    presets: {
+      nameLabel: 'Preset name',
+      namePlaceholder: 'My preset',
+      save: 'Save current style',
+      hint: 'Saves colors, gradient and shapes only, never the QR content or the logo.',
+      empty: 'No saved presets yet.',
+      list: 'Saved presets',
+      apply: 'Apply preset {name}',
+      delete: 'Delete preset {name}',
+      export: 'Export',
+      import: 'Import',
+      limitReached: 'You can save up to {max} presets.',
+      saved: 'Preset "{name}" saved.',
+      deleted: 'Preset "{name}" deleted.',
+      exported: 'Presets exported.',
+      imported: '{count} preset(s) imported.',
+      importError: 'Invalid presets file.',
+      storageError: 'Presets cannot be stored in this browser; they will be lost on reload.',
     },
   },
 
@@ -180,5 +225,6 @@ export const en: Translations = {
   common: {
     required: 'required',
     optional: 'optional',
+    selectCountry: 'Select country...',
   },
 };
