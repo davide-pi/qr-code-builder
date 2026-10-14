@@ -1,0 +1,25 @@
+# Netlify headers. Lives in public/ so it is copied into dist/: the CD workflow deploys the
+# prebuilt dist/ folder (nwtgck/actions-netlify, no repo checkout), where a root netlify.toml
+# would never be read.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  X-Frame-Options: DENY
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/index.html
+  Cache-Control: no-cache
+
+/sw.js
+  Cache-Control: no-cache
+
+/registerSW.js
+  Cache-Control: no-cache
+
+/manifest.webmanifest
+  Cache-Control: no-cache
