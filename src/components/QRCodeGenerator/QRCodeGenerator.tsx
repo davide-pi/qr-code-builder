@@ -12,8 +12,12 @@ const MAX_HISTORY = 50;
 const SENSITIVE_TEMPLATES: QRTemplateType[] = ['wifi', 'location'];
 
 // Strip sensitive encoded data before persisting to localStorage
-const toPersistableOptions = (options: QROptions): QROptions =>
-  SENSITIVE_TEMPLATES.includes(options.templateType) ? { ...options, data: '' } : options;
+const toPersistableOptions = (options: QROptions): Partial<QROptions> => {
+  if (!SENSITIVE_TEMPLATES.includes(options.templateType)) return options;
+  const persistable: Partial<QROptions> = { ...options };
+  delete persistable.data;
+  return persistable;
+};
 
 // Load saved options from localStorage
 const loadSavedOptions = (): QROptions => {
