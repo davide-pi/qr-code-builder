@@ -171,11 +171,23 @@ export interface Translations {
     copyToClipboard: string;
     copied: string;
     downloadAs: string;
+    previewLabel: string;
+    exportSize: string;
+    pdfSize: string;
+    pdfFitA4: string;
+    preparing: string;
     errors: {
       contentTooLong: string;
       failedToGenerate: string;
       failedToDownload: string;
       failedToInitialize: string;
+      failedToCopy: string;
+    };
+    scannability: {
+      title: string;
+      lowContrast: string;
+      inverted: string;
+      logoNeedsHighEc: string;
     };
   };
 

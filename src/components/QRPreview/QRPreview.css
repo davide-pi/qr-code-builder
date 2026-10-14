@@ -317,3 +317,57 @@
     min-width: 100%;
   }
 }
+
+/* ========== EXPORT OPTIONS & SCANNABILITY ========== */
+
+.qr-warnings {
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.9rem;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.qr-warnings ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.export-options {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.export-option {
+  display: flex;
+  flex: 1;
+  min-width: 120px;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.export-option select {
+  padding: 0.4rem 0.5rem;
+}
+
+.qr-preview-section .spin {
+  animation: qr-spin 1s linear infinite;
+}
+
+@keyframes qr-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qr-preview-section .spin {
+    animation-duration: 4s;
+  }
+}
