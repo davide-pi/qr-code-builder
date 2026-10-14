@@ -8,6 +8,14 @@ import './QRCodeGenerator.css';
 
 const MAX_HISTORY = 50;
 
+// Persist only the styling: the encoded data may hold sensitive values (WiFi password,
+// geo coordinates) and the template form is not persisted, so it always restarts empty
+const toPersistableOptions = (options: QROptions): Omit<QROptions, 'data'> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { data, ...styling } = options;
+  return styling;
+};
+
 // Load saved options from localStorage
 const loadSavedOptions = (): QROptions => {
   try {
@@ -63,7 +71,7 @@ export default function QRCodeGenerator() {
   // Save options to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(options));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toPersistableOptions(options)));
     } catch {
       console.warn('Failed to save QR settings');
     }
