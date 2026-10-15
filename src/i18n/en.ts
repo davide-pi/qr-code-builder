@@ -220,8 +220,9 @@ export const en: Translations = {
       saved: 'Preset "{name}" saved.',
       deleted: 'Preset "{name}" deleted.',
       exported: 'Presets exported.',
-      imported: '{count} preset(s) imported.',
+      imported: '{added} preset(s) added, {replaced} replaced.',
       importError: 'Invalid presets file.',
+      importReadError: 'The file could not be read.',
       storageError: 'Presets cannot be stored in this browser; they will be lost on reload.',
     },
   },
@@ -315,5 +316,15 @@ export const en: Translations = {
     required: 'required',
     optional: 'optional',
     selectCountry: 'Select country...',
+  },
+
+  // PWA update toast
+  pwa: {
+    updateAvailable: 'New version available.',
+    updateHint: 'Reload to update. Any unsaved input will be lost.',
+    reload: 'Reload',
+    later: 'Later',
+    offlineReady: 'Ready to work offline.',
+    dismiss: 'Dismiss',
   },
 };

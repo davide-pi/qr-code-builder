@@ -220,8 +220,9 @@ export const ro: Translations = {
       saved: 'Presetarea "{name}" a fost salvată.',
       deleted: 'Presetarea "{name}" a fost ștearsă.',
       exported: 'Presetări exportate.',
-      imported: '{count} presetări importate.',
+      imported: '{added} presetări adăugate, {replaced} înlocuite.',
       importError: 'Fișier de presetări invalid.',
+      importReadError: 'Fișierul nu a putut fi citit.',
       storageError: 'Presetările nu pot fi stocate în acest browser; se vor pierde la reîncărcare.',
     },
   },
@@ -315,5 +316,15 @@ export const ro: Translations = {
     required: 'obligatoriu',
     optional: 'opțional',
     selectCountry: 'Selectează țara...',
+  },
+
+  // PWA update toast
+  pwa: {
+    updateAvailable: 'Versiune nouă disponibilă.',
+    updateHint: 'Reîncarcă pentru a actualiza. Datele introduse se vor pierde.',
+    reload: 'Reîncarcă',
+    later: 'Mai târziu',
+    offlineReady: 'Pregătită pentru utilizare offline.',
+    dismiss: 'Închide',
   },
 };

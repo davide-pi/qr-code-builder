@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { LanguageProvider } from './i18n';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+import UpdatePrompt from './components/UpdatePrompt/UpdatePrompt';
 import QRCodeGenerator from './components/QRCodeGenerator/QRCodeGenerator';
 import './App.css';
 
@@ -46,6 +47,7 @@ function App() {
           <QRCodeGenerator />
         </main>
         <Footer />
+        <UpdatePrompt />
       </div>
     </LanguageProvider>
   );

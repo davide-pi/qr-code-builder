@@ -7,7 +7,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt': a new version never reloads the page by itself (in-memory form data would be lost)
+      registerType: 'prompt',
       injectRegister: 'auto',
       includeAssets: ['logo.svg', 'apple-touch-icon.png'],
       manifest: {
@@ -26,10 +27,21 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Precache the whole build (shell, lazy chunks such as jsPDF, flag SVGs) for full offline use.
+        // Precache the app shell and small lazy chunks (flag SVGs...).
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest,woff2}'],
-        // The jsPDF chunk exceeds Workbox's 2 MiB default.
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        // PDF export chunks (~780 kB) are only needed by who exports a PDF: cached at first use instead.
+        globIgnores: ['**/assets/{jspdf.es.min,html2canvas,index.es,purify.es}-*.js'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => /\/assets\/(jspdf\.es\.min|html2canvas|index\.es|purify\.es)-[^/]+\.js$/.test(url.pathname),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'pdf-chunks',
+              expiration: { maxEntries: 8 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+        ],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
       },

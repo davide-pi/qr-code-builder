@@ -99,7 +99,8 @@ export function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-export function saveBlob(blob: Blob, fileName: string): void {
+/** Triggers a browser download. The object URL is revoked later: some browsers start reading it asynchronously. */
+export function downloadBlob(blob: Blob, fileName: string): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -107,7 +108,7 @@ export function saveBlob(blob: Blob, fileName: string): void {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');

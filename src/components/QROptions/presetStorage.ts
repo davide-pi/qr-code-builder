@@ -163,13 +163,30 @@ export const parseImportedPresets = (text: string): UserPreset[] | null => {
   return presets.length > 0 ? presets : null;
 };
 
-// Merges by (case-insensitive) name: an existing preset with the same name is replaced, up to the cap
-export const mergePresets = (current: UserPreset[], incoming: UserPreset[]): UserPreset[] => {
-  const merged = [...current];
+export interface MergeResult {
+  presets: UserPreset[];
+  added: number;
+  replaced: number;
+}
+
+// Merges by (case-insensitive) name: an existing preset with the same name is replaced, up to the cap.
+// `added` / `replaced` count the entries that actually changed the list (entries over the cap are dropped).
+export const mergePresetsWithCounts = (current: UserPreset[], incoming: UserPreset[]): MergeResult => {
+  const presets = [...current];
+  let added = 0;
+  let replaced = 0;
   for (const preset of incoming) {
-    const index = merged.findIndex((p) => p.name.toLowerCase() === preset.name.toLowerCase());
-    if (index >= 0) merged[index] = { ...preset, id: merged[index].id };
-    else if (merged.length < MAX_USER_PRESETS) merged.push(preset);
+    const index = presets.findIndex((p) => p.name.toLowerCase() === preset.name.toLowerCase());
+    if (index >= 0) {
+      presets[index] = { ...preset, id: presets[index].id };
+      replaced++;
+    } else if (presets.length < MAX_USER_PRESETS) {
+      presets.push(preset);
+      added++;
+    }
   }
-  return merged;
+  return { presets, added, replaced };
 };
+
+export const mergePresets = (current: UserPreset[], incoming: UserPreset[]): UserPreset[] =>
+  mergePresetsWithCounts(current, incoming).presets;
