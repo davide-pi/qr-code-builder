@@ -12,8 +12,9 @@ Netlify.
 | Type-check + build | `npm run build` |
 | Lint | `npm run lint` |
 | Preview build | `npm run preview` |
+| Unit tests | `npm test` |
 
-A change is done only when `npm run lint` and `npm run build` pass.
+A change is done only when `npm run lint`, `npm test` and `npm run build` pass.
 
 ## Rules
 
@@ -37,3 +38,16 @@ A change is done only when `npm run lint` and `npm run build` pass.
 - Releases: pushing a `vX.Y.Z` tag deploys to production; every push to `main` deploys a
   preview (see `.github/workflows/`).
 - PR description: Summary · Motivation · Changes · Testing · Breaking changes (omit if none).
+
+## Docs
+
+Technical docs live in `docs/` (index: `docs/README.md`). Keep them in sync with the code they describe.
+
+| Doc | Read when you… |
+|-----|----------------|
+| `docs/architecture.md` | need the component map, editor/history/debounce flow, exports, batch, lazy chunks or the PWA update flow |
+| `docs/templates.md` | change or add a template, a payload format, escaping or phone/URL normalization |
+| `docs/i18n.md` | add a string or a language |
+| `docs/privacy.md` | store anything or touch persistence or the PWA update behavior |
+| `docs/deploy.md` | touch CI/CD, GitVersion, `public/_headers` (CSP) or service worker caching |
+| `docs/testing.md` | write or run tests, or do the manual smoke check before a release |
