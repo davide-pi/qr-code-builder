@@ -1,7 +1,7 @@
 import { Link } from 'lucide-react';
 import { defaultURLData, type URLData } from '../types/qr';
 import { UrlForm } from './forms/LinkForms';
-import { isValidUrl, normalizeUrl } from './lib/url';
+import { normalizeUrl, validateUrl } from './lib/url';
 import type { QRTemplate } from './types';
 
 export const urlTemplate: QRTemplate<URLData> = {
@@ -11,7 +11,8 @@ export const urlTemplate: QRTemplate<URLData> = {
   defaultData: () => ({ ...defaultURLData }),
   validate: (data) => {
     if (!data.url.trim()) return { url: 'required' };
-    return isValidUrl(data.url) ? {} : { url: 'invalidUrl' };
+    const error = validateUrl(data.url);
+    return error ? { url: error } : {};
   },
   buildPayload: (data) => normalizeUrl(data.url),
   Form: UrlForm,

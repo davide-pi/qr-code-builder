@@ -20,7 +20,18 @@ export type HistoryAction<S> =
   | { type: 'redo' }
   | { type: 'reset'; state: S };
 
-export const createHistory = <S>(initial: S): HistoryState<S> => ({
+// Structural equality for plain data (objects, arrays, primitives)
+export function deepEqual(a: unknown, b: unknown): boolean {
+  if (Object.is(a, b)) return true;
+  if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  const left = a as Record<string, unknown>;
+  const right = b as Record<string, unknown>;
+  const keys = Object.keys(left);
+  return keys.length === Object.keys(right).length && keys.every((key) => key in right && deepEqual(left[key], right[key]));
+}
+
+export const createHistory =<S>(initial: S): HistoryState<S> => ({
   entries: [initial],
   index: 0,
   current: initial,
@@ -66,6 +77,8 @@ export function historyReducer<S>(history: HistoryState<S>, action: HistoryActio
       return { ...settled, index, current: settled.entries[index] };
     }
     case 'reset':
+      // Resetting a state that already is the target changes nothing: no spurious undo step
+      if (deepEqual(history.current, action.state)) return history;
       // Itself an undo step
       return commit({ ...commit(history), current: action.state });
   }

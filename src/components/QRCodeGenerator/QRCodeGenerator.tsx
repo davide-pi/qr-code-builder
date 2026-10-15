@@ -1,7 +1,7 @@
 import { FileSpreadsheet } from 'lucide-react';
-import { lazy, Suspense, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { lazy, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useReducer, useState } from 'react';
 import { useLanguage } from '../../i18n';
-import { createDefaultFormData, evaluateTemplate, isTemplateType } from '../../templates';
+import { createDefaultFormData, evaluateTemplate } from '../../templates';
 import type {
   ColorPreset, GradientConfig, QROptions, QRTemplateData, QRTemplateType, TemplateFormData,
 } from '../../types/qr';
@@ -12,6 +12,7 @@ import QRPreview from '../QRPreview/QRPreview';
 import {
   canRedo, canUndo, createHistory, historyReducer, type HistoryState,
 } from './history';
+import { MARGIN_RATIO, parseSavedOptions } from './savedOptions';
 import './QRCodeGenerator.css';
 
 // Loaded on first use: the batch dialog and its zip/CSV code stay out of the main bundle
@@ -20,6 +21,8 @@ const BatchDialog = lazy(() => import('../Batch/BatchDialog'));
 // Debounce shared by the QR preview and the history: typing renders the QR and adds an
 // undo step only once the user pauses
 const DEBOUNCE_MS = 500;
+// Debounce of the localStorage write of the styling
+const PERSIST_DEBOUNCE_MS = 300;
 
 // Everything undo/redo restores. `forms` lives in memory only: it holds personal data
 // (Wi-Fi passwords, locations, contacts…) and is never persisted.
@@ -37,48 +40,14 @@ const toPersistableOptions = (options: QROptions): Omit<QROptions, 'data' | 'ima
   return styling;
 };
 
-const isValidColorStops = (stops: unknown): stops is GradientConfig['colorStops'] =>
-  Array.isArray(stops) &&
-  stops.length === 2 &&
-  stops.every((stop) => typeof stop?.offset === 'number' && typeof stop?.color === 'string');
-
-// Merge a saved gradient with the defaults so fields added later are never undefined
-const mergeGradient = (saved: Partial<GradientConfig> | undefined): GradientConfig => ({
-  ...defaultQROptions.dotGradient,
-  ...saved,
-  colorStops: isValidColorStops(saved?.colorStops) ? saved.colorStops : defaultQROptions.dotGradient.colorStops,
-});
-
-// Load saved options from localStorage
+// Load saved options from localStorage (validated: see parseSavedOptions)
 const loadSavedOptions = (): QROptions => {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed: Partial<QROptions> = JSON.parse(saved);
-      // Migrate old imageSize if outside new range (0.1-0.3)
-      if (parsed.imageSize !== undefined) {
-        // If it was in pixels (>1), convert back to percentage
-        if (parsed.imageSize > 1) {
-          parsed.imageSize = parsed.imageSize / 300;
-        }
-        // Clamp to valid range (10%-30%)
-        parsed.imageSize = Math.max(0.1, Math.min(0.3, parsed.imageSize));
-      }
-      // Merge with defaults to ensure new fields are included
-      return {
-        ...defaultQROptions,
-        ...parsed,
-        dotGradient: mergeGradient(parsed.dotGradient),
-        templateType: isTemplateType(parsed.templateType) ? parsed.templateType : defaultQROptions.templateType,
-        // Never restored: older versions may have stored them
-        data: '',
-        image: '',
-      };
-    }
+    return parseSavedOptions(localStorage.getItem(STORAGE_KEY));
   } catch {
     console.warn('Failed to load saved QR settings');
+    return defaultQROptions;
   }
-  return defaultQROptions;
 };
 
 const createEditorHistory = (): HistoryState<EditorState> =>
@@ -116,13 +85,17 @@ export default function QRCodeGenerator() {
     return () => clearTimeout(timer);
   }, [editor]);
 
-  // Save the styling to localStorage whenever it changes (typing does not touch `options`)
+  // Save the styling to localStorage once it stops changing (typing does not touch `options`;
+  // a dragged color or range input fires many events)
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(toPersistableOptions(options)));
-    } catch {
-      console.warn('Failed to save QR settings');
-    }
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(toPersistableOptions(options)));
+      } catch {
+        console.warn('Failed to save QR settings');
+      }
+    }, PERSIST_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
   }, [options]);
 
   const undoable = canUndo(history);
@@ -173,11 +146,13 @@ export default function QRCodeGenerator() {
   // Update a single option
   const updateOption = <K extends keyof QROptions>(key: K, value: QROptions[K]) => {
     setOptions((prev) => {
+      // Same value: keep the previous state, so it is not a new undo step
+      if (Object.is(prev[key], value)) return prev;
       const newOptions = { ...prev, [key]: value };
 
       // If size changes, ensure margin doesn't exceed 15% of new size
       if (key === 'size') {
-        const maxMargin = Math.floor((value as number) * 0.15);
+        const maxMargin = Math.floor((value as number) * MARGIN_RATIO);
         if (newOptions.margin > maxMargin) {
           newOptions.margin = maxMargin;
         }
@@ -243,24 +218,20 @@ export default function QRCodeGenerator() {
     }));
   };
 
-  // Restores the styling and clears every template form
+  // Restores the styling and clears every template form (a no-op, with no undo step, when
+  // everything already is at its default: see the `reset` case of the history reducer)
   const resetToDefault = useCallback(() => {
     dispatch({ type: 'reset', state: { options: defaultQROptions, forms: createDefaultFormData() } });
     setDebouncedData(defaultQROptions.data); // Also reset debounced data immediately
   }, []);
 
-  // Create options with debounced data for QR preview
-  const previewOptions = useMemo(() => ({
-    ...options,
-    data: debouncedData,
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [debouncedData, options.size, options.margin, options.errorCorrectionLevel,
-       options.dotType, options.dotColor, options.dotGradient.enabled,
-       options.dotGradient.type, options.dotGradient.rotation, options.dotGradient.colorStops,
-       options.cornerSquareType, options.cornerSquareColor,
-       options.cornerDotType, options.cornerDotColor,
-       options.backgroundColor, options.transparentBackground,
-       options.image, options.imageSize, options.imageMargin]);
+  // Options for the QR preview: the debounced payload plus the options themselves, so a field
+  // added to QROptions can never be silently left out. `options` keeps its identity while the
+  // user types (typing only changes the forms), so the memo still holds then.
+  const previewOptions = useMemo(() => ({ ...options, data: debouncedData }), [options, debouncedData]);
+  // Color and range inputs fire an event per step: the preview renders them at low priority and
+  // skips the intermediate values instead of calling QRCodeStyling.update() for each one
+  const deferredPreviewOptions = useDeferredValue(previewOptions);
 
   return (
     <div className="qr-generator">
@@ -276,7 +247,7 @@ export default function QRCodeGenerator() {
           {t.batch.open}
         </button>
       </QRDataInput>
-      <QRPreview options={previewOptions} />
+      <QRPreview options={deferredPreviewOptions} />
       <QROptionsPanel
         options={options}
         onUpdateOption={updateOption}

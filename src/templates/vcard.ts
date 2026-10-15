@@ -1,8 +1,8 @@
 import { Contact } from 'lucide-react';
 import { defaultVCardData, type VCardData } from '../types/qr';
 import { VCardForm } from './forms/ContactForms';
-import { CRLF, escapeText, toSingleLine } from './lib/text';
-import { isValidUrl, normalizeUrl } from './lib/url';
+import { CRLF, escapeText, foldLine, toSingleLine } from './lib/text';
+import { normalizeUrl, validateUrl } from './lib/url';
 import type { FieldErrors, QRTemplate } from './types';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -10,7 +10,8 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const displayName = (data: VCardData): string =>
   `${data.firstName} ${data.lastName}`.trim() || data.organization.trim();
 
-// vCard 3.0 (RFC 2426)
+// vCard 3.0 (RFC 2426). UID is optional in 3.0 and is not emitted (it would only enlarge
+// the QR code); long lines are folded at 75 octets.
 const buildPayload = (data: VCardData): string => {
   const fullName = displayName(data);
   if (!fullName) return '';
@@ -31,7 +32,7 @@ const buildPayload = (data: VCardData): string => {
       `ADR:;;${escapeText(data.address)};${escapeText(data.city)};${escapeText(data.state)};${escapeText(data.zip)};${escapeText(data.country)}`,
     'END:VCARD',
   ];
-  return lines.filter(Boolean).join(CRLF);
+  return lines.filter((line): line is string => Boolean(line)).map((line) => foldLine(line)).join(CRLF);
 };
 
 const validate = (data: VCardData): FieldErrors<VCardData> => {
@@ -41,7 +42,8 @@ const validate = (data: VCardData): FieldErrors<VCardData> => {
     errors.phone = 'invalidPhone';
   }
   if (data.email.trim() && !EMAIL_PATTERN.test(data.email.trim())) errors.email = 'invalidEmail';
-  if (data.website.trim() && !isValidUrl(data.website)) errors.website = 'invalidUrl';
+  const websiteError = data.website.trim() ? validateUrl(data.website) : null;
+  if (websiteError) errors.website = websiteError;
   return errors;
 };
 

@@ -115,6 +115,7 @@ export const it: Translations = {
       required: 'Campo obbligatorio',
       nameOrOrganizationRequired: "Inserisci un nome o un'organizzazione",
       invalidUrl: 'Inserisci un URL valido',
+      invalidUrlScheme: 'Questo tipo di link non è supportato',
       invalidEmail: 'Inserisci un indirizzo email valido',
       invalidPhone: 'Inserisci un numero di telefono valido',
       invalidLatitude: 'La latitudine deve essere un numero tra -90 e 90',

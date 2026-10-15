@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  MAX_HISTORY, canRedo, canUndo, createHistory, hasPendingEdits, historyReducer,
+  MAX_HISTORY, canRedo, canUndo, createHistory, deepEqual, hasPendingEdits, historyReducer,
   type HistoryAction, type HistoryState,
 } from './history';
 
@@ -68,6 +68,22 @@ describe('history reducer', () => {
     expect(history.entries).toHaveLength(MAX_HISTORY);
     expect(history.current.text).toBe(String(MAX_HISTORY + 10));
     expect(history.entries[history.index]).toBe(history.current);
+  });
+
+  it('reset of a state that already is the target is a no-op', () => {
+    const history = createHistory<S>({ text: 'initial' });
+    expect(historyReducer(history, { type: 'reset', state: { text: 'initial' } })).toBe(history);
+    const edited = run(history, edit('typing'), { type: 'commit' });
+    const reset = run(edited, { type: 'reset', state: { text: 'initial' } });
+    expect(reset.entries.map((s) => s.text)).toEqual(['initial', 'typing', 'initial']);
+    expect(run(reset, { type: 'reset', state: { text: 'initial' } })).toBe(reset);
+  });
+
+  it('deepEqual compares plain data structurally', () => {
+    expect(deepEqual({ a: [1, { b: 2 }] }, { a: [1, { b: 2 }] })).toBe(true);
+    expect(deepEqual({ a: 1 }, { a: 1, b: undefined })).toBe(false);
+    expect(deepEqual([1], { 0: 1 })).toBe(false);
+    expect(deepEqual({ a: null }, { a: {} })).toBe(false);
   });
 
   it('reset is an undo step that also keeps the pending edits', () => {

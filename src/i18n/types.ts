@@ -119,6 +119,7 @@ export interface Translations {
       required: string;
       nameOrOrganizationRequired: string;
       invalidUrl: string;
+      invalidUrlScheme: string;
       invalidEmail: string;
       invalidPhone: string;
       invalidLatitude: string;
