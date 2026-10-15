@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useLanguage } from '../../i18n';
 import { getTemplate, type FieldErrors } from '../../templates';
 import type { QRTemplateData, QRTemplateType } from '../../types/qr';
@@ -11,9 +12,11 @@ interface QRDataInputProps {
   errors: FieldErrors<QRTemplateData>;
   onTemplateChange: (type: QRTemplateType) => void;
   onDataChange: (data: QRTemplateData) => void;
+  // Extra content shown below the form (e.g. the entry point of the batch dialog)
+  children?: ReactNode;
 }
 
-export default function QRDataInput({ templateType, data, errors, onTemplateChange, onDataChange }: QRDataInputProps) {
+export default function QRDataInput({ templateType, data, errors, onTemplateChange, onDataChange, children }: QRDataInputProps) {
   const { t } = useLanguage();
   const { Form } = getTemplate(templateType);
 
@@ -22,6 +25,7 @@ export default function QRDataInput({ templateType, data, errors, onTemplateChan
       <h2>{t.qrDataInput.title}</h2>
       <TemplateDropdown value={templateType} onChange={onTemplateChange} />
       <Form data={data} onChange={onDataChange} errors={errors} />
+      {children}
     </div>
   );
 }

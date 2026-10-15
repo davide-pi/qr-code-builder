@@ -15,6 +15,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "fflate": "^0.8.3",
     "flag-icons": "^7.5.0",
     "jspdf": "^4.2.1",
     "libphonenumber-js": "^1.12.31",

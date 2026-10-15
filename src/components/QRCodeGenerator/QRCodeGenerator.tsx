@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { FileSpreadsheet } from 'lucide-react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { useLanguage } from '../../i18n';
 import { createDefaultFormData, evaluateTemplate, isTemplateType } from '../../templates';
 import type {
   ColorPreset, GradientConfig, QROptions, QRTemplateData, QRTemplateType, TemplateFormData,
@@ -11,6 +13,9 @@ import {
   canRedo, canUndo, createHistory, historyReducer, type HistoryState,
 } from './history';
 import './QRCodeGenerator.css';
+
+// Loaded on first use: the batch dialog and its zip/CSV code stay out of the main bundle
+const BatchDialog = lazy(() => import('../Batch/BatchDialog'));
 
 // Debounce shared by the QR preview and the history: typing renders the QR and adds an
 // undo step only once the user pauses
@@ -85,6 +90,8 @@ const isEditableTarget = (target: EventTarget | null): boolean =>
   (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
 
 export default function QRCodeGenerator() {
+  const { t } = useLanguage();
+  const [batchOpen, setBatchOpen] = useState(false);
   const [history, dispatch] = useReducer(historyReducer<EditorState>, undefined, createEditorHistory);
   const editor = history.current;
   const { options, forms } = editor;
@@ -263,7 +270,12 @@ export default function QRCodeGenerator() {
         errors={errors}
         onTemplateChange={updateTemplateType}
         onDataChange={(data) => updateFormData(templateType, data)}
-      />
+      >
+        <button type="button" className="batch-open" onClick={() => setBatchOpen(true)}>
+          <FileSpreadsheet size={16} aria-hidden="true" />
+          {t.batch.open}
+        </button>
+      </QRDataInput>
       <QRPreview options={previewOptions} />
       <QROptionsPanel
         options={options}
@@ -277,6 +289,11 @@ export default function QRCodeGenerator() {
         canRedo={redoable}
         onResetToDefault={resetToDefault}
       />
+      {batchOpen && (
+        <Suspense fallback={null}>
+          <BatchDialog options={options} initialType={templateType} onClose={() => setBatchOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 }
