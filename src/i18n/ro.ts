@@ -3,10 +3,10 @@ import type { Translations } from './types';
 export const ro: Translations = {
   // Header
   header: {
-    title: 'Generator Cod QR',
+    title: 'QR Builder',
     switchToLight: 'Comută la tema deschisă',
     switchToDark: 'Comută la tema închisă',
-    logoAlt: 'Logo generator cod QR',
+    tagline: 'gratuit · fără cont',
     language: 'Limba',
   },
 
@@ -143,7 +143,6 @@ export const ro: Translations = {
       errorCorrection: 'Corecție Erori',
       style: 'Stil',
       colors: 'Culori',
-      background: 'Fundal',
       centerLogo: 'Logo Central',
       presets: 'Presetările mele',
     },
@@ -177,6 +176,9 @@ export const ro: Translations = {
       dotColor: 'Culoare Puncte',
       cornerSquare: 'Pătratul colțului',
       cornerDot: 'Punctul colțului',
+      customColors: 'Culori personalizate',
+      hexValue: '{name} (hex)',
+      invalidHex: 'Introdu o culoare precum #1a2b3c sau #abc',
       applyPreset: 'Aplică presetarea de culori {name}',
       presetNames: {
         classic: 'Clasic',
@@ -252,6 +254,7 @@ export const ro: Translations = {
       lowContrast: 'Contrast scăzut între cod și fundal ({ratio}:1, se recomandă minimum 4,5:1).',
       inverted: 'Codul este mai deschis decât fundalul: multe scannere nu pot citi coduri QR inversate.',
       logoNeedsHighEc: 'Un logo acoperă o parte din cod: folosește nivelul de corecție erori Q sau H.',
+      ok: 'Ușor de scanat',
     },
   },
 

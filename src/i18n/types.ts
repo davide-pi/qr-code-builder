@@ -6,7 +6,7 @@ export interface Translations {
     title: string;
     switchToLight: string;
     switchToDark: string;
-    logoAlt: string;
+    tagline: string;
     language: string;
   };
 
@@ -148,7 +148,6 @@ export interface Translations {
       errorCorrection: string;
       style: string;
       colors: string;
-      background: string;
       centerLogo: string;
       presets: string;
     };
@@ -185,6 +184,9 @@ export interface Translations {
       dotColor: string;
       cornerSquare: string;
       cornerDot: string;
+      customColors: string;
+      hexValue: string;
+      invalidHex: string;
       applyPreset: string;
       presetNames: {
         classic: string;
@@ -262,6 +264,7 @@ export interface Translations {
       lowContrast: string;
       inverted: string;
       logoNeedsHighEc: string;
+      ok: string;
     };
   };
 

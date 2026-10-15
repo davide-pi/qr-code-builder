@@ -31,7 +31,7 @@ flowchart TD
 | `App` | `src/App.tsx` | Theme (`data-theme`), `LanguageProvider`, layout |
 | `QRCodeGenerator` | `src/components/QRCodeGenerator/` | Owns the editor state; the only stateful orchestrator |
 | `QRDataInput` | `src/components/QRDataInput/` | Template dropdown + the form of the selected template (controlled by the parent) |
-| `QROptions` | `src/components/QROptions/` | Styling panel (error correction, dot/corner styles, colors, background, logo, built-in and user presets), undo/redo/reset buttons |
+| `QROptions` | `src/components/QROptions/` | Styling panel (error correction, dot/corner styles, colors with the **Custom** panel, logo, built-in and user presets), undo/redo/reset buttons |
 | `QRPreview` | `src/components/QRPreview/` | Live QR, capacity error, scannability warnings, PNG/SVG/PDF export, copy to clipboard |
 | `BatchDialog` | `src/components/Batch/` | CSV to ZIP of QR images, lazy-loaded |
 | `UpdatePrompt` | `src/components/UpdatePrompt/` | "New version" / "offline ready" toast |
@@ -85,6 +85,10 @@ the dropdown, and the batch.
 | File name | `qr-<template>-<yyyymmdd-hhmm>.<ext>` | `buildFileName` |
 | Logo | `QROptions` accepts PNG/JPEG/WebP/SVG up to 2 MiB (file picker or drop), read as a data URL; error correction is raised to H when it was L or M | `QROptions.tsx` |
 
+### Color presets and the Custom panel
+
+The quick-preset swatches apply a built-in palette. The last **Custom** swatch is `aria-pressed` whenever the current colors match no preset (`matchesPreset` in `colorUtils.ts`: free colors, gradient or transparent background) and toggles an inline panel (`aria-expanded`/`aria-controls`) with every color control: dots, gradient, background (incl. transparent), corner squares and corner dots. Each color is a `ColorField`: native picker + hex box (`normalizeHex` accepts `#rrggbb`, `#rgb` and the same without `#`; an invalid value shows a translated error once the box is left and is never applied).
+
 ### User presets
 
 `UserPresets` stores `{ name, style }` entries (style = dot/corner/background colors and types, gradient,
@@ -125,5 +129,6 @@ form data lives only in memory ([privacy.md](privacy.md)).
 
 ## Theme and language
 
+- Visual design: Aurora palette as CSS variables in `src/App.css` (`:root` = dark, `[data-theme="light"]` = light); every text/background pair is at least 4.5:1. Fonts Sora (display) and Manrope (body) are self-hosted from `@fontsource-variable/*` (latin + latin-ext only, declared in `src/fonts.css`), so the CSP stays `font-src 'self'` and the PWA works offline. The preview tile is rotated -2deg with CSS on screen only; exports are rendered offscreen and never rotated.
 - Theme: `data-theme` on `<html>`. The initial value is the saved choice, else the OS preference at load (dark when it expresses none). Only an explicit toggle is saved (`qr-generator-theme`); the OS preference is not tracked live.
 - Language: saved choice, else `navigator.language` (`it`, `ro`, otherwise `en`); `<html lang>` follows it.

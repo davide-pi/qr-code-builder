@@ -205,7 +205,7 @@ export default function BatchDialog({ options, initialType, onClose }: BatchDial
             })}
           </p>
           <p className="batch-note">{t.batch.booleanHint}</p>
-          <button type="button" className="btn btn-export" onClick={downloadTemplate}>
+          <button type="button" className="btn btn-secondary" onClick={downloadTemplate}>
             <Download size={16} aria-hidden="true" />
             {t.batch.downloadTemplate}
           </button>
@@ -288,7 +288,7 @@ export default function BatchDialog({ options, initialType, onClose }: BatchDial
       <div className="batch-actions">
         <button
           type="button"
-          className={running ? 'btn btn-export' : 'btn btn-copy'}
+          className={running ? 'btn btn-secondary' : 'btn btn-primary'}
           onClick={running ? () => abortRef.current?.abort() : generate}
           disabled={!running && validRows.length === 0}
         >

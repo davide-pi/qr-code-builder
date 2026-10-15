@@ -6,9 +6,9 @@
   overflow-y: auto;
   background: var(--card-bg);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--raised-border);
+  border-radius: 20px;
+  box-shadow: 0 24px 64px var(--shadow-color);
 }
 
 .batch-dialog::backdrop {
@@ -21,13 +21,13 @@
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .batch-header h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 
 .batch-close {
@@ -35,8 +35,8 @@
   padding: 0.4rem;
   background: transparent;
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border: 1px solid var(--raised-border);
+  border-radius: 10px;
   cursor: pointer;
 }
 
@@ -47,7 +47,7 @@
 .batch-close:focus-visible,
 .batch-file:focus-within,
 .batch-table-wrap:focus-visible {
-  outline: 2px solid var(--input-focus-border);
+  outline: 2px solid var(--accent-light);
   outline-offset: 2px;
 }
 
@@ -84,16 +84,7 @@
 
 .batch-error {
   font-size: 0.875rem;
-  color: #ef4444;
-}
-
-.batch-step .btn,
-.batch-actions .btn {
-  flex: 0 1 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  color: var(--danger);
 }
 
 .batch-step .export-options {
@@ -113,7 +104,7 @@
   max-height: 320px;
   overflow: auto;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .batch-table {
@@ -142,12 +133,12 @@
 }
 
 .batch-status-ok {
-  color: #16a34a;
+  color: var(--success-text);
   font-weight: 600;
 }
 
 .batch-status-skipped {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .batch-actions {

@@ -21,6 +21,7 @@ import {
   downloadBlob,
 } from './qrExport';
 import type { PdfSize } from './qrExport';
+import Segmented from '../Segmented/Segmented';
 import './QRPreview.css';
 
 interface QRPreviewProps {
@@ -201,12 +202,14 @@ export default function QRPreview({ options }: QRPreviewProps) {
         </div>
       )}
 
-      <div
-        className={`qr-preview ${displayError ? 'has-error' : ''}`}
-        ref={qrRef}
-        role="img"
-        aria-label={t.qrPreview.previewLabel}
-      />
+      <div className="qr-preview-stage">
+        <div
+          className={`qr-preview ${displayError ? 'has-error' : ''} ${options.transparentBackground ? 'is-transparent' : ''}`}
+          ref={qrRef}
+          role="img"
+          aria-label={t.qrPreview.previewLabel}
+        />
+      </div>
 
       {isDataValid && warnings.length > 0 && (
         <div className="qr-warnings" role="status">
@@ -219,43 +222,32 @@ export default function QRPreview({ options }: QRPreviewProps) {
         </div>
       )}
 
-      <div className="export-options">
-        <label className="export-option">
-          <span>{t.qrPreview.exportSize}</span>
-          <select value={exportSize} onChange={(e) => setExportSize(Number(e.target.value))}>
-            {EXPORT_SIZES.map((size) => (
-              <option key={size} value={size}>{size} px</option>
-            ))}
-          </select>
-        </label>
-        <label className="export-option">
-          <span>{t.qrPreview.pdfSize}</span>
-          <select value={pdfSize} onChange={(e) => setPdfSize(e.target.value as PdfSize)}>
-            {PDF_SIZES.map((size) => (
-              <option key={size} value={size}>{pdfSizeLabel(size)}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      {canCopyImage && (
-        <div className="action-buttons">
-          <button
-            onClick={copyToClipboard}
-            className="btn btn-copy"
-            aria-label={t.qrPreview.copyToClipboard}
-            disabled={actionsDisabled}
-          >
-            {busy === 'copy' ? <Loader2 size={16} className="spin" /> : copySuccess ? <Check size={16} /> : <Copy size={16} />}
-            {copySuccess ? t.qrPreview.copied : t.qrPreview.copyToClipboard}
-          </button>
-        </div>
+      {isDataValid && warnings.length === 0 && (
+        <p className="qr-scan-ok" role="status">
+          <Check size={16} aria-hidden="true" />
+          {t.qrPreview.scannability.ok}
+        </p>
       )}
+
+      <div className="export-options">
+        <Segmented
+          label={t.qrPreview.exportSize}
+          value={exportSize}
+          options={EXPORT_SIZES.map((size) => ({ value: size as number, label: `${size} px` }))}
+          onChange={setExportSize}
+        />
+        <Segmented
+          label={t.qrPreview.pdfSize}
+          value={pdfSize}
+          options={PDF_SIZES.map((size) => ({ value: size, label: pdfSizeLabel(size) }))}
+          onChange={setPdfSize}
+        />
+      </div>
 
       <div className="export-buttons" role="group" aria-label={t.qrPreview.downloadAs}>
         <button
           onClick={downloadPNG}
-          className="btn btn-export"
+          className="btn btn-cta export-png"
           aria-label={`${t.qrPreview.downloadAs} PNG`}
           disabled={actionsDisabled}
         >
@@ -264,7 +256,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
         </button>
         <button
           onClick={downloadSVG}
-          className="btn btn-export"
+          className="btn btn-secondary"
           aria-label={`${t.qrPreview.downloadAs} SVG`}
           disabled={actionsDisabled}
         >
@@ -273,7 +265,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
         </button>
         <button
           onClick={downloadPDF}
-          className="btn btn-export"
+          className="btn btn-secondary"
           aria-label={`${t.qrPreview.downloadAs} PDF`}
           aria-busy={busy === 'pdf'}
           disabled={actionsDisabled}
@@ -282,6 +274,18 @@ export default function QRPreview({ options }: QRPreviewProps) {
           {busy === 'pdf' ? t.qrPreview.preparing : 'PDF'}
         </button>
       </div>
+
+      {canCopyImage && (
+        <button
+          onClick={copyToClipboard}
+          className="btn btn-secondary copy-button"
+          aria-label={t.qrPreview.copyToClipboard}
+          disabled={actionsDisabled}
+        >
+          {busy === 'copy' ? <Loader2 size={16} className="spin" /> : copySuccess ? <Check size={16} /> : <Copy size={16} />}
+          {copySuccess ? t.qrPreview.copied : t.qrPreview.copyToClipboard}
+        </button>
+      )}
     </div>
   );
 }

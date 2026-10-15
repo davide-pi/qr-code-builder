@@ -4,118 +4,360 @@
   box-sizing: border-box;
 }
 
-/* CSS Variables for theming */
+/* ========== THEME TOKENS ========== */
+/* Aurora palette. `:root` is the dark default, `[data-theme="light"]` the light variant. */
 :root {
-  /* Dark theme (default) */
-  --bg-gradient-start: #5a67d8;
-  --bg-gradient-end: #6b46c1;
-  --card-bg: #1e1e2e;
-  --card-bg-secondary: #2a2a3e;
-  --text-primary: #ffffff;
-  --text-secondary: #b4b4c4;
-  --text-muted: #8888a0;
-  --border-color: #3a3a50;
-  --input-bg: #252535;
-  --input-border: #404055;
-  --input-focus-border: #5a67d8;
-  --shadow-color: rgba(0, 0, 0, 0.3);
-  --scrollbar-track: #2a2a3e;
-  --scrollbar-thumb: #4a4a60;
-  --checkered-color: #3a3a4a;
+  --font-display: 'Sora Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Manrope Variable', 'Segoe UI', system-ui, sans-serif;
+
+  --header-h: calc(68px + env(safe-area-inset-top, 0px));
+  --footer-h: calc(56px + env(safe-area-inset-bottom, 0px));
+
+  /* Surfaces */
+  --bg: #0d0a1a;
+  --card-bg: #161227;
+  --card-bg-secondary: #1e1838; /* raised / secondary surfaces */
+  --border-color: #2a2342;
+  --raised-border: #3b3166;
+  --header-border: #221c38;
+  --input-bg: #100c20;
+  --input-border: #2a2342;
+
+  /* Text */
+  --text-primary: #f4f1ff;
+  --text-secondary: #c9c2e3;
+  --text-muted: #a49cc2;
+
+  /* Accent */
+  --accent: #7c3aed;
+  --accent-light: #c4b5fd; /* links and icons */
+  --accent-gradient: linear-gradient(135deg, #7c3aed, #c026d3);
+  --accent-ring: rgba(124, 58, 237, 0.35);
+  --input-focus-border: var(--accent);
+  --focus-shadow: 0 0 0 1px var(--accent), 0 0 0 4px var(--accent-ring);
+
+  /* Status */
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.1);
+  --danger-border: rgba(248, 113, 113, 0.35);
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --warning-border: rgba(245, 158, 11, 0.4);
+  --success-bg: #10291d;
+  --success-text: #86efac;
+
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --scrollbar-track: #161227;
+  --scrollbar-thumb: #3b3166;
+  --qr-tile-shadow: 0 0 0 1px #2a2342, 0 30px 80px -20px rgba(124, 58, 237, 0.4);
+
+  color-scheme: dark;
 }
 
 [data-theme="light"] {
-  --bg-gradient-start: #7b6fb2;
-  --bg-gradient-end: #b794d4;
+  --bg: #f6f3ff;
   --card-bg: #ffffff;
-  --card-bg-secondary: #f8f9fa;
-  --text-primary: #333333;
-  --text-secondary: #555555;
-  --text-muted: #888888;
-  --border-color: #e0e0e0;
-  --input-bg: #ffffff;
-  --input-border: #dddddd;
-  --input-focus-border: #7b6fb2;
-  --shadow-color: rgba(0, 0, 0, 0.1);
-  --scrollbar-track: #f1f1f1;
-  --scrollbar-thumb: #c1c1c1;
-  --checkered-color: #e0e0e0;
+  --card-bg-secondary: #f1ecff;
+  --border-color: #e4dcfa;
+  --raised-border: #d6cbf5;
+  --header-border: #e4dcfa;
+  --input-bg: #fbfaff;
+  --input-border: #e4dcfa;
+
+  --text-primary: #1c1530;
+  --text-secondary: #4a4262;
+  --text-muted: #6b6385;
+
+  --accent: #6d28d9;
+  --accent-light: #6d28d9; /* the light tint has no contrast on white */
+  --accent-gradient: linear-gradient(135deg, #6d28d9, #a21caf);
+  --accent-ring: rgba(109, 40, 217, 0.25);
+
+  --danger: #c81e1e;
+  --danger-bg: rgba(200, 30, 30, 0.07);
+  --danger-border: rgba(200, 30, 30, 0.35);
+  --warning-bg: rgba(245, 158, 11, 0.14);
+  --warning-border: rgba(180, 110, 0, 0.45);
+  --success-bg: #dcfce7;
+  --success-text: #166534;
+
+  --shadow-color: rgba(28, 21, 48, 0.12);
+  --scrollbar-track: #f6f3ff;
+  --scrollbar-thumb: #cfc4f0;
+  --qr-tile-shadow: 0 0 0 1px #e4dcfa, 0 24px 60px -24px rgba(109, 40, 217, 0.25);
+
+  color-scheme: light;
 }
 
-html, body {
-  height: 100%;
-  overflow: hidden;
+html {
+  background: var(--bg);
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-primary);
 }
 
-#root {
-  height: 100%;
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
 }
 
-.app {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
+/* ========== LAYOUT SHELL ========== */
+/* Small screens and tablets: the page scrolls. Wide screens: fixed shell, each column scrolls. */
 main {
-  flex: 1;
-  padding-top: 56px; /* Space for fixed header */
-  padding-bottom: 56px; /* Space for fixed footer */
-  overflow: hidden;
-  display: flex;
+  padding-top: var(--header-h);
+  padding-bottom: var(--footer-h);
 }
 
-/* Mobile responsive - allow scrolling on small screens */
-@media (max-width: 768px) {
-  html, body {
-    overflow: auto;
+@media (min-width: 1201px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #root {
+    height: 100%;
   }
 
   .app {
-    min-height: 100vh;
-    height: auto;
-    overflow: visible;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   main {
-    overflow: visible;
-    padding-top: 50px;
-    padding-bottom: 50px;
+    flex: 1;
+    min-height: 0;
+    display: flex;
   }
 }
 
-/* Small mobile breakpoint */
-@media (max-width: 480px) {
-  main {
-    padding-top: 48px;
-    padding-bottom: 48px;
+@media (max-width: 768px) {
+  :root {
+    --header-h: calc(60px + env(safe-area-inset-top, 0px));
+    --footer-h: calc(50px + env(safe-area-inset-bottom, 0px));
   }
 }
 
-/* Improve touch behavior on mobile */
-@media (hover: none) and (pointer: coarse) {
-  /* Disable hover effects that don't work well on touch */
-  .btn:hover,
-  .btn-icon:hover,
-  .style-btn:hover,
-  .preset-btn:hover,
-  .ec-btn:hover {
-    transform: none;
-  }
+/* Keyboard focus is never removed: components restyle it, they do not hide it */
+:focus-visible {
+  outline: 2px solid var(--accent-light);
+  outline-offset: 2px;
+}
 
-  /* Add active states for touch feedback */
-  .btn:active,
-  .btn-icon:active,
-  .style-btn:active,
-  .preset-btn:active,
-  .ec-btn:active {
-    transform: scale(0.95);
-    opacity: 0.8;
+/* ========== SHARED CONTROLS ========== */
+/* Text inputs, selects and textareas of every form (template forms and the options panel) */
+.form-group :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), select, textarea),
+.option-group :is(input[type="text"], select),
+.export-option select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6rem 0.85rem;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.9rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 88px;
+}
+
+.form-group :is(input, select, textarea):focus,
+.option-group :is(input[type="text"], select):focus,
+.export-option select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-shadow);
+}
+
+.form-group :is(input, textarea)::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+.form-group [aria-invalid="true"],
+.option-group [aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  user-select: none;
+  color: var(--text-primary);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ========== SHARED BUTTONS ========== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.65rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.btn svg {
+  flex-shrink: 0;
+}
+
+.btn:focus-visible,
+.btn-icon:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-shadow);
+}
+
+.btn:active:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-small {
+  min-height: 36px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+/* Solid accent: secondary emphasis (e.g. "Save" in My Presets, Batch "Generate") */
+.btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+/* The one main action of the page (Download PNG) */
+.btn-cta {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  box-shadow: 0 8px 24px -8px var(--accent-ring);
+}
+
+.btn-cta:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn-secondary {
+  background: var(--card-bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--raised-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--accent-light);
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: #ffffff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-icon:hover:not(:disabled) {
+  color: var(--accent-light);
+  background: var(--card-bg-secondary);
+  border-color: var(--raised-border);
+}
+
+.btn-icon:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Export size / PDF size selects (QRPreview and the batch dialog) */
+.export-options {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.export-option {
+  display: flex;
+  flex: 1;
+  min-width: 120px;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Scrollbars of the scrolling columns */
+.qr-data-input,
+.qr-preview-section,
+.qr-options-section {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Section titles: small uppercase muted labels in the display font */
+.qr-data-input > h2,
+.qr-preview-section > h2,
+.options-header h2,
+.section-title {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Transitions are dropped for users who ask for less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
   }
 }
