@@ -233,7 +233,7 @@ export const it: Translations = {
   // QR Preview
   qrPreview: {
     title: 'Anteprima',
-    contentRequired: 'Il contenuto è obbligatorio',
+    contentHint: 'Compila il contenuto per generare il tuo QR',
     copyToClipboard: 'Copia negli Appunti',
     copied: 'Copiato!',
     downloadAs: 'Scarica come',

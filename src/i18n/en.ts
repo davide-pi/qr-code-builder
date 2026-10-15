@@ -233,7 +233,7 @@ export const en: Translations = {
   // QR Preview
   qrPreview: {
     title: 'Preview',
-    contentRequired: 'Content is required',
+    contentHint: 'Fill in the content to generate your QR',
     copyToClipboard: 'Copy to Clipboard',
     copied: 'Copied!',
     downloadAs: 'Download as',

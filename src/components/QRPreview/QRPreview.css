@@ -11,13 +11,6 @@
   overflow-x: hidden;
 }
 
-/* Scrolls inside the fixed shell of wide screens only */
-@media (min-width: 1201px) {
-  .qr-preview-section {
-    overflow-y: auto;
-  }
-}
-
 .qr-preview-section > h2 {
   flex-shrink: 0;
 }
@@ -60,6 +53,19 @@
   box-shadow: var(--qr-tile-shadow);
   transform: rotate(-2deg);
   overflow: hidden;
+}
+
+/* Empty state: the placeholder stays, softly dimmed, under a neutral hint */
+.qr-preview-section .qr-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.qr-preview-section .qr-preview.is-empty canvas,
+.qr-preview-section .qr-preview.is-empty svg {
+  opacity: 0.35;
 }
 
 /* Checkered backdrop shows the transparency of the exported file */
@@ -123,11 +129,23 @@
   gap: 0.75rem;
 }
 
-/* Download PNG on its own row, SVG and PDF side by side below */
+/* Download PNG on its own row, SVG / PDF / Copy as three equal buttons below */
 .qr-preview-section .export-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.qr-preview-section .export-buttons.no-copy {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.qr-preview-section .export-buttons .btn {
+  min-width: 0;
+  gap: 0.35rem;
+  padding-inline: 0.25rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .qr-preview-section .export-png {
@@ -147,6 +165,28 @@
 @media (prefers-reduced-motion: reduce) {
   .qr-preview-section .spin {
     animation-duration: 4s;
+  }
+}
+
+/* Fixed shell of wide screens: the column must fit without an inner scroll, so the tile and
+   the gaps shrink with the viewport height (overflow stays as a safety net on tiny heights) */
+@media (min-width: 1201px) {
+  .qr-preview-section {
+    overflow-y: auto;
+    gap: 0.75rem;
+  }
+
+  .qr-preview-stage {
+    padding: 0.5rem 0.5rem;
+  }
+
+  .qr-preview-section .qr-preview {
+    width: min(340px, 38vh);
+    padding: 16px;
+  }
+
+  .qr-preview-section .export-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

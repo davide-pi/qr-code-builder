@@ -65,7 +65,8 @@ export default function QRPreview({ options }: QRPreviewProps) {
   const renderError = renderFailure?.source === qrOptions ? renderFailure.message : null;
 
   const error = capacityError ?? renderError;
-  const displayError = error ?? actionError ?? (isDataEmpty ? t.qrPreview.contentRequired : null);
+  // An empty field is not an error: it gets a calm hint until the user fills it in.
+  const displayError = error ?? actionError;
   const isDataValid = !isDataEmpty && !error;
 
   const warnings = useMemo(() => getScanWarnings(options), [options]);
@@ -202,9 +203,11 @@ export default function QRPreview({ options }: QRPreviewProps) {
         </div>
       )}
 
+      {isDataEmpty && !displayError && <p className="qr-hint">{t.qrPreview.contentHint}</p>}
+
       <div className="qr-preview-stage">
         <div
-          className={`qr-preview ${displayError ? 'has-error' : ''} ${options.transparentBackground ? 'is-transparent' : ''}`}
+          className={`qr-preview ${displayError ? 'has-error' : ''} ${isDataEmpty && !displayError ? 'is-empty' : ''} ${options.transparentBackground ? 'is-transparent' : ''}`}
           ref={qrRef}
           role="img"
           aria-label={t.qrPreview.previewLabel}
@@ -244,7 +247,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
         />
       </div>
 
-      <div className="export-buttons" role="group" aria-label={t.qrPreview.downloadAs}>
+      <div className={`export-buttons ${canCopyImage ? '' : 'no-copy'}`} role="group" aria-label={t.qrPreview.downloadAs}>
         <button
           onClick={downloadPNG}
           className="btn btn-cta export-png"
@@ -273,19 +276,18 @@ export default function QRPreview({ options }: QRPreviewProps) {
           {busy === 'pdf' ? <Loader2 size={16} className="spin" /> : <Download size={16} />}
           {busy === 'pdf' ? t.qrPreview.preparing : 'PDF'}
         </button>
+        {canCopyImage && (
+          <button
+            onClick={copyToClipboard}
+            className="btn btn-secondary"
+            aria-label={t.qrPreview.copyToClipboard}
+            disabled={actionsDisabled}
+          >
+            {busy === 'copy' ? <Loader2 size={16} className="spin" /> : copySuccess ? <Check size={16} /> : <Copy size={16} />}
+            {copySuccess ? t.qrPreview.copied : t.qrPreview.copyToClipboard}
+          </button>
+        )}
       </div>
-
-      {canCopyImage && (
-        <button
-          onClick={copyToClipboard}
-          className="btn btn-secondary copy-button"
-          aria-label={t.qrPreview.copyToClipboard}
-          disabled={actionsDisabled}
-        >
-          {busy === 'copy' ? <Loader2 size={16} className="spin" /> : copySuccess ? <Check size={16} /> : <Copy size={16} />}
-          {copySuccess ? t.qrPreview.copied : t.qrPreview.copyToClipboard}
-        </button>
-      )}
     </div>
   );
 }

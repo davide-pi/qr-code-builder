@@ -233,7 +233,7 @@ export const ro: Translations = {
   // QR Preview
   qrPreview: {
     title: 'Previzualizare',
-    contentRequired: 'Conținut obligatoriu',
+    contentHint: 'Completează conținutul pentru a genera codul QR',
     copyToClipboard: 'Copiază în Clipboard',
     copied: 'Copiat!',
     downloadAs: 'Descarcă ca',

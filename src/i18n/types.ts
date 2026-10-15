@@ -243,7 +243,7 @@ export interface Translations {
   // QR Preview
   qrPreview: {
     title: string;
-    contentRequired: string;
+    contentHint: string;
     copyToClipboard: string;
     copied: string;
     downloadAs: string;
