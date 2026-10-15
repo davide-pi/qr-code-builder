@@ -263,6 +263,58 @@ export interface Translations {
     };
   };
 
+  // Batch generation from CSV
+  batch: {
+    open: string;
+    title: string;
+    close: string;
+    intro: string;
+    privacy: string;
+    step1: string;
+    step2: string;
+    step3: string;
+    downloadTemplate: string;
+    columnsHint: string;
+    booleanHint: string;
+    uploadLabel: string;
+    fileLoaded: string;
+    ignoredColumns: string;
+    previewTitle: string;
+    summary: string;
+    columnRow: string;
+    columnFile: string;
+    columnContent: string;
+    columnStatus: string;
+    statusOk: string;
+    statusSkipped: string;
+    format: string;
+    size: string;
+    stylingNote: string;
+    generate: string;
+    cancel: string;
+    progress: string;
+    done: string;
+    doneWithFailures: string;
+    cancelled: string;
+    errors: {
+      fileTooLarge: string;
+      readFailed: string;
+      noRows: string;
+      noKnownColumns: string;
+      tooManyRows: string;
+      unterminatedQuote: string;
+      noValidRows: string;
+      generateFailed: string;
+    };
+    // Problems found by the batch itself (the template's own ones use qrDataInput.errors)
+    issues: {
+      invalidBoolean: string;
+      invalidChoice: string;
+      invalidDate: string;
+      contentTooLong: string;
+    };
+  };
+
   // Footer
   footer: {
     builtBy: string;

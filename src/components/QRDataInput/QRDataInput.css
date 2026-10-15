@@ -269,6 +269,32 @@
   cursor: pointer;
 }
 
+/* Entry point of the batch dialog */
+.batch-open {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding: 0.65rem 1rem;
+  background: var(--card-bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.batch-open:hover {
+  border-color: var(--input-focus-border);
+}
+
+.batch-open:focus-visible {
+  outline: 2px solid var(--input-focus-border);
+  outline-offset: 2px;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .qr-data-input {
