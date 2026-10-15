@@ -51,6 +51,8 @@ export interface EmailData {
 }
 
 export interface SMSData {
+  // ISO 3166-1 alpha-2 shown by the country select; several countries share a calling code
+  country: string;
   countryCode: string;
   phone: string;
   message: string;
@@ -73,12 +75,14 @@ export interface LocationData {
 
 // Phone Call Data
 export interface PhoneData {
+  country: string;
   countryCode: string;
   phone: string;
 }
 
 // WhatsApp Data
 export interface WhatsAppData {
+  country: string;
   countryCode: string;
   phone: string;
   message: string;
@@ -241,6 +245,7 @@ export const defaultEmailData: EmailData = {
 };
 
 export const defaultSMSData: SMSData = {
+  country: 'IT',
   countryCode: '+39',
   phone: '',
   message: '',
@@ -275,11 +280,13 @@ export const defaultLocationData: LocationData = {
 };
 
 export const defaultPhoneData: PhoneData = {
+  country: 'IT',
   countryCode: '+39',
   phone: '',
 };
 
 export const defaultWhatsAppData: WhatsAppData = {
+  country: 'IT',
   countryCode: '+39',
   phone: '',
   message: '',

@@ -61,7 +61,8 @@ export function SmsForm({ data, onChange, errors }: TemplateFormProps<SMSData>) 
     <div className="template-form">
       <PhoneField
         id="smsPhone" required label={f.phoneNumber} placeholder={f.phonePlaceholder}
-        countryCode={data.countryCode} onCountryCodeChange={set('countryCode')}
+        country={data.country} countryCode={data.countryCode}
+        onCountryChange={(country, countryCode) => onChange({ ...data, country, countryCode })}
         phone={data.phone} onPhoneChange={set('phone')} error={errors.phone}
       />
       <TextField id="message" rows={4} label={f.message} value={data.message} onChange={set('message')} />
@@ -77,7 +78,8 @@ export function PhoneCallForm({ data, onChange, errors }: TemplateFormProps<Phon
     <div className="template-form">
       <PhoneField
         id="phoneNumber" required label={f.phoneNumber} placeholder={f.phonePlaceholder}
-        countryCode={data.countryCode} onCountryCodeChange={set('countryCode')}
+        country={data.country} countryCode={data.countryCode}
+        onCountryChange={(country, countryCode) => onChange({ ...data, country, countryCode })}
         phone={data.phone} onPhoneChange={set('phone')} error={errors.phone}
       />
     </div>
@@ -92,7 +94,8 @@ export function WhatsAppForm({ data, onChange, errors }: TemplateFormProps<Whats
     <div className="template-form">
       <PhoneField
         id="waPhone" required label={f.phoneNumber} placeholder={f.phonePlaceholder}
-        countryCode={data.countryCode} onCountryCodeChange={set('countryCode')}
+        country={data.country} countryCode={data.countryCode}
+        onCountryChange={(country, countryCode) => onChange({ ...data, country, countryCode })}
         phone={data.phone} onPhoneChange={set('phone')} error={errors.phone}
       />
       <TextField

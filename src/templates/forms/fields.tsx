@@ -125,9 +125,10 @@ export function CheckboxField({ label, checked, onChange }: CheckboxFieldProps) 
 interface PhoneFieldProps {
   id: string;
   label: string;
+  country: string;
   countryCode: string;
   phone: string;
-  onCountryCodeChange: (value: string) => void;
+  onCountryChange: (country: string, countryCode: string) => void;
   onPhoneChange: (value: string) => void;
   error?: ErrorKey;
   required?: boolean;
@@ -136,14 +137,14 @@ interface PhoneFieldProps {
 
 // Country code selector + national number input
 export function PhoneField({
-  id, label, countryCode, phone, onCountryCodeChange, onPhoneChange, error, required, placeholder,
+  id, label, country, countryCode, phone, onCountryChange, onPhoneChange, error, required, placeholder,
 }: PhoneFieldProps) {
   const [touched, setTouched] = useState(false);
   return (
     <FieldFrame id={id} label={label} required={required} error={error} touched={touched}>
       <div className="phone-input-group">
         <div className="country-code-select-wrapper">
-          <CountryCodeSelect value={countryCode} onChange={onCountryCodeChange} />
+          <CountryCodeSelect value={country} callingCode={countryCode} onChange={onCountryChange} />
         </div>
         <input
           type="tel"

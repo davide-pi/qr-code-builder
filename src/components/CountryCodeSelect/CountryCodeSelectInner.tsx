@@ -5,15 +5,17 @@ import { buildCountryCodes } from './countryCodes';
 import './CountryCodeSelect.css';
 
 interface CountryOption {
-  // Unique per country: several countries share the same dialing code
+  // ISO country code: unique per country, while several countries share the same dialing code
   key: string;
+  // Dialing code ("+1")
   value: string;
   label: string;
 }
 
 interface CountryCodeSelectProps {
+  // ISO country code of the selected option
   value: string;
-  onChange: (value: string) => void;
+  onChange: (country: string, callingCode: string) => void;
 }
 
 export default function CountryCodeSelectInner({ value, onChange }: CountryCodeSelectProps) {
@@ -29,11 +31,11 @@ export default function CountryCodeSelectInner({ value, onChange }: CountryCodeS
     [language],
   );
 
-  const selectedOption = countryOptions.find((opt) => opt.value === value) || null;
+  const selectedOption = countryOptions.find((opt) => opt.key === value) || null;
 
   const handleChange = (option: SingleValue<CountryOption>) => {
     if (option) {
-      onChange(option.value);
+      onChange(option.key, option.value);
     }
   };
 

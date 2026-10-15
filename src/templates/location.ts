@@ -3,11 +3,13 @@ import { defaultLocationData, type LocationData } from '../types/qr';
 import { LocationForm } from './forms/LinkForms';
 import type { FieldErrors, QRTemplate } from './types';
 
-// Accepts a comma or a dot as decimal separator; returns the dotted string or null
+// Accepts a comma or a dot as decimal separator; returns the dotted string or null.
+// RFC 5870 wants `1*DIGIT ["." 1*DIGIT]`, so "45." becomes "45" and ".5" becomes "0.5".
 const parseCoordinate = (value: string, limit: number): string | null => {
   const normalized = value.trim().replace(',', '.').replace(/^\+/, '');
   if (!/^-?(\d+\.?\d*|\.\d+)$/.test(normalized)) return null;
-  return Math.abs(Number(normalized)) <= limit ? normalized : null;
+  if (Math.abs(Number(normalized)) > limit) return null;
+  return normalized.replace(/^(-?)\./, '$10.').replace(/\.$/, '');
 };
 
 // RFC 5870 geo URI; the `q` parameter (understood by map apps) carries the label

@@ -115,6 +115,7 @@ export const ro: Translations = {
       required: 'Câmp obligatoriu',
       nameOrOrganizationRequired: 'Introdu un nume sau o organizație',
       invalidUrl: 'Introdu un URL valid',
+      invalidUrlScheme: 'Acest tip de link nu este acceptat',
       invalidEmail: 'Introdu o adresă de email validă',
       invalidPhone: 'Introdu un număr de telefon valid',
       invalidLatitude: 'Latitudinea trebuie să fie un număr între -90 și 90',
