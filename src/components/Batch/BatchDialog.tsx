@@ -4,7 +4,7 @@ import { useLanguage } from '../../i18n';
 import type { Translations } from '../../i18n/types';
 import type { QROptions, QRTemplateType } from '../../types/qr';
 import TemplateDropdown from '../QRDataInput/TemplateDropdown';
-import { DEFAULT_EXPORT_SIZE, EXPORT_SIZES, buildFileName, saveBlob } from '../QRPreview/qrExport';
+import { DEFAULT_EXPORT_SIZE, EXPORT_SIZES, buildFileName, downloadBlob } from '../QRPreview/qrExport';
 import { generateBatchZip } from './batchGenerate';
 import {
   MAX_BATCH_FILE_BYTES, MAX_BATCH_ROWS, buildBatchRows, buildHeaderTemplate, getColumns,
@@ -118,7 +118,7 @@ export default function BatchDialog({ options, initialType, onClose }: BatchDial
     // The BOM makes Excel read the file as UTF-8; it expects `;` where the decimal separator is `,`
     const delimiter: CsvDelimiter = language === 'en' ? ',' : ';';
     const blob = new Blob([`\uFEFF${buildHeaderTemplate(type, delimiter)}`], { type: 'text/csv;charset=utf-8' });
-    saveBlob(blob, `qr-batch-template-${type}.csv`);
+    downloadBlob(blob, `qr-batch-template-${type}.csv`);
   };
 
   const generate = async () => {
@@ -144,7 +144,7 @@ export default function BatchDialog({ options, initialType, onClose }: BatchDial
           }
         },
       });
-      saveBlob(zip, buildFileName('batch', 'zip'));
+      downloadBlob(zip, buildFileName('batch', 'zip'));
       const count = validRows.length - failed.length;
       setStatus(failed.length === 0
         ? fill(t.batch.done, { count })
