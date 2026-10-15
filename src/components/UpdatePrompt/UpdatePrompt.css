@@ -1,0 +1,29 @@
+.update-prompt {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1000;
+  max-width: min(22rem, calc(100vw - 2rem));
+  padding: 0.875rem 1rem;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px var(--shadow-color);
+}
+
+.update-prompt-title {
+  font-weight: 600;
+}
+
+.update-prompt-hint {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.update-prompt-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}

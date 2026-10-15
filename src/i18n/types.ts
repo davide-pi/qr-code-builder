@@ -232,6 +232,7 @@ export interface Translations {
       exported: string;
       imported: string;
       importError: string;
+      importReadError: string;
       storageError: string;
     };
   };
@@ -274,6 +275,16 @@ export interface Translations {
     required: string;
     optional: string;
     selectCountry: string;
+  };
+
+  // PWA update toast
+  pwa: {
+    updateAvailable: string;
+    updateHint: string;
+    reload: string;
+    later: string;
+    offlineReady: string;
+    dismiss: string;
   };
 }
 

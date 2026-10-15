@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Download, Upload, Trash2 } from 'lucide-react';
 import type { QROptions } from '../../types/qr';
 import { useLanguage } from '../../i18n';
+import { downloadBlob } from '../QRPreview/qrExport';
 import {
   MAX_IMPORT_BYTES,
   MAX_PRESET_NAME_LENGTH,
@@ -9,6 +10,7 @@ import {
   createPresetId,
   loadUserPresets,
   mergePresets,
+  mergePresetsWithCounts,
   parseImportedPresets,
   pickStyle,
   saveUserPresets,
@@ -33,9 +35,12 @@ export default function UserPresets({ options, onUpdateOption }: UserPresetsProp
   const [name, setName] = useState('');
   const [status, setStatus] = useState<Status | null>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
+  // Always the latest list: the async import must not merge into a stale snapshot
+  const presetsRef = useRef(presets);
 
   // Updates state and storage; reports when the browser refuses to store the presets
   const persist = (next: UserPreset[], successText: string) => {
+    presetsRef.current = next;
     setPresets(next);
     if (saveUserPresets(next)) {
       setStatus({ text: successText, isError: false });
@@ -82,12 +87,7 @@ export default function UserPresets({ options, onUpdateOption }: UserPresetsProp
 
   const handleExport = () => {
     const blob = new Blob([serializePresets(presets)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'qr-code-presets.json';
-    link.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(blob, 'qr-code-presets.json');
     setStatus({ text: labels.exported, isError: false });
   };
 
@@ -96,12 +96,24 @@ export default function UserPresets({ options, onUpdateOption }: UserPresetsProp
     const file = input.files?.[0];
     input.value = '';
     if (!file) return;
-    const imported = file.size <= MAX_IMPORT_BYTES ? parseImportedPresets(await file.text()) : null;
+    let imported: UserPreset[] | null = null;
+    if (file.size <= MAX_IMPORT_BYTES) {
+      try {
+        imported = parseImportedPresets(await file.text());
+      } catch {
+        setStatus({ text: labels.importReadError, isError: true });
+        return;
+      }
+    }
     if (!imported) {
       setStatus({ text: labels.importError, isError: true });
       return;
     }
-    persist(mergePresets(presets, imported), labels.imported.replace('{count}', String(imported.length)));
+    const { presets: merged, added, replaced } = mergePresetsWithCounts(presetsRef.current, imported);
+    persist(
+      merged,
+      labels.imported.replace('{added}', String(added)).replace('{replaced}', String(replaced)),
+    );
   };
 
   return (

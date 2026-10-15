@@ -18,7 +18,7 @@ import {
   getPdfPixels,
   getPdfSideMm,
   renderBlob,
-  saveBlob,
+  downloadBlob,
 } from './qrExport';
 import type { PdfSize } from './qrExport';
 import './QRPreview.css';
@@ -145,7 +145,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
   const downloadPNG = () =>
     runAction(
       'png',
-      async () => saveBlob(await renderBlob(options, 'png', exportSize), buildFileName(fileBase, 'png')),
+      async () => downloadBlob(await renderBlob(options, 'png', exportSize), buildFileName(fileBase, 'png')),
       `${t.qrPreview.errors.failedToDownload} PNG`,
     );
 
@@ -153,7 +153,7 @@ export default function QRPreview({ options }: QRPreviewProps) {
     runAction(
       'svg',
       // The serialized SVG already carries xmlns and the requested width/height.
-      async () => saveBlob(await renderBlob(options, 'svg', exportSize), buildFileName(fileBase, 'svg')),
+      async () => downloadBlob(await renderBlob(options, 'svg', exportSize), buildFileName(fileBase, 'svg')),
       `${t.qrPreview.errors.failedToDownload} SVG`,
     );
 
