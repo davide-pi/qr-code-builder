@@ -1,0 +1,8 @@
+/* Size follows the font-size of the context, as with the former flag-icons classes (4:3 ratio) */
+.flag {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1.333em;
+  height: 1em;
+  object-fit: cover;
+}

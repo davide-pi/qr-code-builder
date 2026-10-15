@@ -1,25 +1,22 @@
 .qr-data-input {
   background: var(--card-bg);
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  height: 100%;
-  overflow-y: auto;
+  gap: 1.25rem;
+  min-height: 0;
 }
 
-.qr-data-input h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0 0 0.75rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--border-color);
-  color: var(--text-primary);
+/* Scrolls inside the fixed shell of wide screens only */
+@media (min-width: 1201px) {
+  .qr-data-input {
+    overflow-y: auto;
+  }
 }
 
-/* Template Dropdown */
+/* Template Dropdown (also used by the batch dialog, so not nested under .qr-data-input) */
 .template-dropdown-container {
   display: flex;
   flex-direction: column;
@@ -28,43 +25,38 @@
 }
 
 .template-dropdown-container > label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
-/* Custom Dropdown Trigger Button */
 .template-dropdown-trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6rem 0.85rem;
   background: var(--input-bg);
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 0.9375rem;
-  font-weight: 500;
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: var(--text-primary);
   cursor: pointer;
-  transition: all 0.2s ease;
-  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .template-dropdown-trigger:hover {
-  border-color: var(--input-focus-border);
+  border-color: var(--raised-border);
 }
 
-.template-dropdown-trigger:focus {
-  outline: none;
-  border-color: var(--input-focus-border);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
-}
-
+.template-dropdown-trigger:focus-visible,
 .template-dropdown-trigger.open {
-  border-color: var(--input-focus-border);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-shadow);
 }
 
 .template-dropdown-selected {
@@ -73,30 +65,32 @@
   gap: 0.625rem;
 }
 
-.dropdown-chevron {
+.template-dropdown-selected svg {
+  color: var(--accent-light);
+}
+
+.template-dropdown-trigger .dropdown-chevron {
   transition: transform 0.2s ease;
   color: var(--text-muted);
 }
 
-.dropdown-chevron.rotated {
+.template-dropdown-trigger .dropdown-chevron.rotated {
   transform: rotate(180deg);
 }
 
 /* Dropdown Menu */
 .template-dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 6px);
   left: 0;
   right: 0;
-  background: var(--card-bg);
-  border: 2px solid var(--input-focus-border);
-  border-top: none;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
+  background: var(--card-bg-secondary);
+  border: 1px solid var(--raised-border);
+  border-radius: 12px;
   max-height: 320px;
   overflow-y: auto;
   z-index: 100;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 16px 40px var(--shadow-color);
 }
 
 .template-dropdown-group {
@@ -104,15 +98,16 @@
 }
 
 .template-dropdown-group:not(:last-child) {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--raised-border);
 }
 
 .template-dropdown-group-label {
   padding: 0.5rem 0.75rem 0.375rem;
+  font-family: var(--font-display);
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
 }
 
@@ -124,161 +119,133 @@
   padding: 0.625rem 0.75rem;
   background: transparent;
   border: none;
+  font: inherit;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-primary);
   cursor: pointer;
-  transition: background 0.15s ease;
   text-align: left;
 }
 
-.template-dropdown-item:hover {
-  background: var(--card-bg-secondary);
-}
-
+.template-dropdown-item:hover,
 .template-dropdown-item:focus {
   outline: none;
-  background: var(--card-bg-secondary);
+  background: var(--card-bg);
 }
 
-.template-dropdown-item.selected {
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
-  color: #ffffff;
-  box-shadow: 0 0 12px color-mix(in srgb, var(--bg-gradient-start) 50%, transparent),
-              0 0 4px color-mix(in srgb, var(--bg-gradient-end) 40%, transparent);
+/* Option highlighted with the keyboard (aria-activedescendant) */
+.template-dropdown-item.active {
+  background: var(--card-bg);
+  outline: 2px solid var(--accent-light);
+  outline-offset: -2px;
 }
 
+.template-dropdown-item.selected,
 .template-dropdown-item.selected:hover {
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
-  filter: brightness(1.1);
-  box-shadow: 0 0 16px color-mix(in srgb, var(--bg-gradient-start) 60%, transparent),
-              0 0 6px color-mix(in srgb, var(--bg-gradient-end) 50%, transparent);
+  background: var(--accent);
+  color: #ffffff;
 }
 
-.template-form {
+.qr-data-input .template-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.form-group {
+.qr-data-input .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
-.form-group label {
+.qr-data-input .form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.qr-data-input .form-group .checkbox-label {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-primary);
 }
 
-.form-group input[type="text"],
-.form-group input[type="url"],
-.form-group input[type="email"],
-.form-group input[type="tel"],
-.form-group input[type="datetime-local"],
-.form-group input[type="date"],
-.form-group select,
-.form-group textarea {
-  padding: 0.625rem;
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  transition: border-color 0.2s ease;
+.qr-data-input .field-error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--danger);
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-.form-group textarea {
-  resize: vertical;
-  font-family: inherit;
-}
-
-.form-row {
+.qr-data-input .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
 }
 
 /* Phone Input with Country Code */
-.phone-input-group {
+.qr-data-input .phone-input-group {
   display: flex;
   gap: 0.5rem;
   align-items: flex-start;
 }
 
-.country-code-select-wrapper {
+.qr-data-input .country-code-select-wrapper {
   flex-shrink: 0;
   width: 160px;
 }
 
-.phone-number-input {
+.qr-data-input .phone-number-input {
   flex: 1;
-  padding: 0.625rem;
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  transition: border-color 0.2s ease;
+  min-width: 0;
 }
 
-.phone-number-input:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-.checkbox-label {
-  display: flex;
+/* Entry point of the batch dialog */
+.qr-data-input .batch-open {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  margin-top: auto;
+  min-height: 44px;
+  padding: 0.6rem 1rem;
+  background: var(--card-bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--raised-border);
+  border-radius: 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: border-color 0.15s ease;
 }
 
-.checkbox-label input[type="checkbox"] {
-  width: 1rem;
-  height: 1rem;
-  cursor: pointer;
+.qr-data-input .batch-open svg {
+  color: var(--accent-light);
+}
+
+.qr-data-input .batch-open:hover {
+  border-color: var(--accent-light);
+}
+
+.qr-data-input .batch-open:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-shadow);
 }
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-  .qr-data-input {
-    padding: 1rem;
-    overflow: visible;
-  }
-
   .template-dropdown-menu {
     max-height: 280px;
   }
 
-  .template-dropdown-trigger {
-    font-size: 0.875rem;
-    padding: 0.625rem;
-  }
-
-  .template-dropdown-item {
-    padding: 0.5rem 0.625rem;
-    font-size: 0.8125rem;
-  }
-
-  .form-row {
+  .qr-data-input .form-row {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  .qr-data-input h2 {
-    font-size: 1.125rem;
+  .qr-data-input {
+    padding: 16px;
   }
 }

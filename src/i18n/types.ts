@@ -6,6 +6,8 @@ export interface Translations {
     title: string;
     switchToLight: string;
     switchToDark: string;
+    tagline: string;
+    language: string;
   };
 
   // QR Data Input
@@ -42,6 +44,7 @@ export interface Translations {
       snapchat: string;
       paypal: string;
       bitcoin: string;
+      epc: string;
     };
     // Form labels
     form: {
@@ -102,6 +105,33 @@ export interface Translations {
       bitcoinAddress: string;
       bitcoinAddressPlaceholder: string;
       amountBtc: string;
+      encryptionNone: string;
+      beneficiaryName: string;
+      iban: string;
+      ibanPlaceholder: string;
+      bic: string;
+      bicPlaceholder: string;
+      amountEur: string;
+      remittanceText: string;
+    };
+    // Inline validation messages
+    errors: {
+      required: string;
+      nameOrOrganizationRequired: string;
+      invalidUrl: string;
+      invalidUrlScheme: string;
+      invalidEmail: string;
+      invalidPhone: string;
+      invalidLatitude: string;
+      invalidLongitude: string;
+      invalidAmount: string;
+      invalidHandle: string;
+      invalidBitcoinAddress: string;
+      endBeforeStart: string;
+      invalidIban: string;
+      invalidBic: string;
+      amountOutOfRange: string;
+      tooLong: string;
     };
   };
 
@@ -118,12 +148,18 @@ export interface Translations {
       errorCorrection: string;
       style: string;
       colors: string;
-      background: string;
       centerLogo: string;
+      presets: string;
     };
     // Error Correction
     errorCorrection: {
       level: string;
+      labels: {
+        L: string;
+        M: string;
+        Q: string;
+        H: string;
+      };
       levels: {
         L: string;
         M: string;
@@ -148,6 +184,18 @@ export interface Translations {
       dotColor: string;
       cornerSquare: string;
       cornerDot: string;
+      customColors: string;
+      hexValue: string;
+      invalidHex: string;
+      applyPreset: string;
+      presetNames: {
+        classic: string;
+        ocean: string;
+        forest: string;
+        sunset: string;
+        purple: string;
+        monochrome: string;
+      };
     };
     // Background
     background: {
@@ -161,21 +209,114 @@ export interface Translations {
       removeLogo: string;
       size: string;
       margin: string;
+      preview: string;
+      ecRaised: string;
+      errors: {
+        invalidType: string;
+        tooLarge: string;
+        readFailed: string;
+      };
+    };
+    // Saved presets
+    presets: {
+      nameLabel: string;
+      namePlaceholder: string;
+      save: string;
+      hint: string;
+      empty: string;
+      list: string;
+      apply: string;
+      delete: string;
+      export: string;
+      import: string;
+      limitReached: string;
+      saved: string;
+      deleted: string;
+      exported: string;
+      imported: string;
+      importError: string;
+      importReadError: string;
+      storageError: string;
     };
   };
 
   // QR Preview
   qrPreview: {
     title: string;
-    contentRequired: string;
+    contentHint: string;
     copyToClipboard: string;
     copied: string;
     downloadAs: string;
+    previewLabel: string;
+    exportSize: string;
+    pdfSize: string;
+    pdfFitA4: string;
+    preparing: string;
     errors: {
       contentTooLong: string;
       failedToGenerate: string;
       failedToDownload: string;
       failedToInitialize: string;
+      failedToCopy: string;
+    };
+    scannability: {
+      title: string;
+      lowContrast: string;
+      inverted: string;
+      logoNeedsHighEc: string;
+      ok: string;
+    };
+  };
+
+  // Batch generation from CSV
+  batch: {
+    open: string;
+    title: string;
+    close: string;
+    intro: string;
+    privacy: string;
+    step1: string;
+    step2: string;
+    step3: string;
+    downloadTemplate: string;
+    columnsHint: string;
+    booleanHint: string;
+    uploadLabel: string;
+    fileLoaded: string;
+    ignoredColumns: string;
+    previewTitle: string;
+    summary: string;
+    columnRow: string;
+    columnFile: string;
+    columnContent: string;
+    columnStatus: string;
+    statusOk: string;
+    statusSkipped: string;
+    format: string;
+    size: string;
+    stylingNote: string;
+    generate: string;
+    cancel: string;
+    progress: string;
+    done: string;
+    doneWithFailures: string;
+    cancelled: string;
+    errors: {
+      fileTooLarge: string;
+      readFailed: string;
+      noRows: string;
+      noKnownColumns: string;
+      tooManyRows: string;
+      unterminatedQuote: string;
+      noValidRows: string;
+      generateFailed: string;
+    };
+    // Problems found by the batch itself (the template's own ones use qrDataInput.errors)
+    issues: {
+      invalidBoolean: string;
+      invalidChoice: string;
+      invalidDate: string;
+      contentTooLong: string;
     };
   };
 
@@ -189,6 +330,17 @@ export interface Translations {
   common: {
     required: string;
     optional: string;
+    selectCountry: string;
+  };
+
+  // PWA update toast
+  pwa: {
+    updateAvailable: string;
+    updateHint: string;
+    reload: string;
+    later: string;
+    offlineReady: string;
+    dismiss: string;
   };
 }
 

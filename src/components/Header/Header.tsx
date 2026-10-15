@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect, useId } from 'react';
+import { Sun, Moon, ChevronDown, QrCode } from 'lucide-react';
 import { useLanguage, availableLanguages } from '../../i18n';
 import { LanguageFlag } from '../Flags/Flags';
 import './Header.css';
@@ -12,7 +12,11 @@ interface HeaderProps {
 export default function Header({ theme, onToggleTheme }: HeaderProps) {
   const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const listboxId = useId();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -26,23 +30,95 @@ export default function Header({ theme, onToggleTheme }: HeaderProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentLang = availableLanguages.find(l => l.code === language);
+  // Roving focus: keep DOM focus on the active option while the listbox is open
+  useEffect(() => {
+    if (isOpen) {
+      optionRefs.current[activeIndex]?.focus();
+    }
+  }, [isOpen, activeIndex]);
+
+  const selectedIndex = availableLanguages.findIndex((l) => l.code === language);
+  const currentLang = availableLanguages[selectedIndex];
+
+  const openMenu = (index: number = selectedIndex) => {
+    setActiveIndex(index);
+    setIsOpen(true);
+  };
+
+  const closeMenu = () => {
+    setIsOpen(false);
+    toggleRef.current?.focus();
+  };
+
+  const selectLanguage = (index: number) => {
+    setLanguage(availableLanguages[index].code);
+    closeMenu();
+  };
+
+  const handleToggleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      openMenu(e.key === 'ArrowUp' ? availableLanguages.length - 1 : selectedIndex);
+    }
+  };
+
+  const handleOptionKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    const last = availableLanguages.length - 1;
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setActiveIndex(index === last ? 0 : index + 1);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setActiveIndex(index === 0 ? last : index - 1);
+        break;
+      case 'Home':
+        e.preventDefault();
+        setActiveIndex(0);
+        break;
+      case 'End':
+        e.preventDefault();
+        setActiveIndex(last);
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        selectLanguage(index);
+        break;
+      case 'Escape':
+        e.preventDefault();
+        closeMenu();
+        break;
+      case 'Tab':
+        // Let the browser move focus on from the toggle button
+        closeMenu();
+        break;
+    }
+  };
 
   return (
     <header className="app-header">
       <div className="header-content">
         <div className="header-title">
-          <img src="logo-white.svg" alt="QR Code" className="header-logo" />
+          <span className="header-logo" aria-hidden="true">
+            <QrCode size={20} />
+          </span>
           <h1>{t.header.title}</h1>
+          <span className="header-pill">{t.header.tagline}</span>
         </div>
         <div className="header-actions">
           {/* Language Selector Dropdown */}
           <div className="language-selector" ref={dropdownRef}>
             <button
+              ref={toggleRef}
               className="language-toggle"
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => (isOpen ? setIsOpen(false) : openMenu())}
+              onKeyDown={handleToggleKeyDown}
+              aria-label={`${t.header.language}: ${currentLang?.name}`}
               aria-expanded={isOpen}
               aria-haspopup="listbox"
+              aria-controls={isOpen ? listboxId : undefined}
             >
               <span className="current-lang">
                 <LanguageFlag code={language} />
@@ -51,21 +127,29 @@ export default function Header({ theme, onToggleTheme }: HeaderProps) {
               <ChevronDown size={14} className={`lang-chevron ${isOpen ? 'rotated' : ''}`} />
             </button>
             {isOpen && (
-              <div className="language-dropdown" role="listbox">
-                {availableLanguages.map((lang) => (
-                  <button
+              <div
+                id={listboxId}
+                className="language-dropdown"
+                role="listbox"
+                aria-label={t.header.language}
+              >
+                {availableLanguages.map((lang, index) => (
+                  <div
                     key={lang.code}
-                    className={`language-option ${language === lang.code ? 'active' : ''}`}
-                    onClick={() => {
-                      setLanguage(lang.code);
-                      setIsOpen(false);
+                    ref={(el) => {
+                      optionRefs.current[index] = el;
                     }}
+                    className={`language-option ${language === lang.code ? 'active' : ''}`}
                     role="option"
+                    lang={lang.code}
                     aria-selected={language === lang.code}
+                    tabIndex={index === activeIndex ? 0 : -1}
+                    onClick={() => selectLanguage(index)}
+                    onKeyDown={(e) => handleOptionKeyDown(e, index)}
                   >
                     <LanguageFlag code={lang.code} className="lang-flag" />
                     <span className="lang-name">{lang.name}</span>
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -76,7 +160,7 @@ export default function Header({ theme, onToggleTheme }: HeaderProps) {
             onClick={onToggleTheme}
             aria-label={theme === 'dark' ? t.header.switchToLight : t.header.switchToDark}
           >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         </div>
       </div>

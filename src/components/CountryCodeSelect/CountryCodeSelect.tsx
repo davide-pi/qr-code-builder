@@ -1,47 +1,33 @@
-import Select, { type SingleValue } from 'react-select';
-import { countryCodes } from '../../types/qr';
-import './CountryCodeSelect.css';
-
-interface CountryOption {
-  value: string;
-  label: string;
-}
+import { lazy, Suspense } from 'react';
+import { useLanguage } from '../../i18n';
 
 interface CountryCodeSelectProps {
+  // ISO 3166-1 alpha-2 of the selected country (several countries share a calling code)
   value: string;
-  onChange: (value: string) => void;
+  // Calling code of the selected country ("+39"), shown while the select is loading
+  callingCode: string;
+  onChange: (country: string, callingCode: string) => void;
 }
 
-const countryOptions: CountryOption[] = countryCodes.map(({ code, country }) => ({
-  value: code,
-  label: `${code} ${country}`,
-}));
+// react-select is heavy: load it only when a template with a phone number is shown
+const CountryCodeSelectInner = lazy(() => import('./CountryCodeSelectInner'));
 
-export default function CountryCodeSelect({ value, onChange }: CountryCodeSelectProps) {
-  const selectedOption = countryOptions.find((opt) => opt.value === value) || null;
-
-  const handleChange = (option: SingleValue<CountryOption>) => {
-    if (option) {
-      onChange(option.value);
-    }
-  };
+export default function CountryCodeSelect({ callingCode, ...props }: CountryCodeSelectProps) {
+  const { t } = useLanguage();
 
   return (
-    <Select<CountryOption>
-      value={selectedOption}
-      onChange={handleChange}
-      options={countryOptions}
-      placeholder="Select country..."
-      isSearchable
-      classNamePrefix="country-select"
-      menuPlacement="auto"
-      filterOption={(option, inputValue) => {
-        const searchLower = inputValue.toLowerCase();
-        return (
-          option.label.toLowerCase().includes(searchLower) ||
-          option.value.includes(inputValue)
-        );
-      }}
-    />
+    <Suspense
+      fallback={
+        <select
+          disabled
+          value={callingCode}
+          aria-label={t.common.selectCountry}
+        >
+          <option value={callingCode}>{callingCode}</option>
+        </select>
+      }
+    >
+      <CountryCodeSelectInner {...props} />
+    </Suspense>
   );
 }

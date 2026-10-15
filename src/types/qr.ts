@@ -1,5 +1,4 @@
 import type { DotType, CornerSquareType, CornerDotType, GradientType, ErrorCorrectionLevel } from 'qr-code-styling';
-import { getCountries, getCountryCallingCode, type CountryCode } from 'libphonenumber-js';
 
 // Template Categories
 export type TemplateCategory = 'all' | 'links' | 'contact' | 'social' | 'payment';
@@ -15,7 +14,7 @@ export type QRTemplateType =
   // Social
   | 'instagram' | 'twitter' | 'linkedin' | 'tiktok' | 'youtube' | 'facebook' | 'snapchat'
   // Payment
-  | 'paypal' | 'bitcoin'
+  | 'paypal' | 'bitcoin' | 'epc'
   // Utilities
   | 'wifi' | 'calendar' | 'location';
 
@@ -52,6 +51,8 @@ export interface EmailData {
 }
 
 export interface SMSData {
+  // ISO 3166-1 alpha-2 shown by the country select; several countries share a calling code
+  country: string;
   countryCode: string;
   phone: string;
   message: string;
@@ -74,12 +75,14 @@ export interface LocationData {
 
 // Phone Call Data
 export interface PhoneData {
+  country: string;
   countryCode: string;
   phone: string;
 }
 
 // WhatsApp Data
 export interface WhatsAppData {
+  country: string;
   countryCode: string;
   phone: string;
   message: string;
@@ -99,20 +102,54 @@ export interface SocialMediaData {
 // PayPal Data
 export interface PayPalData {
   username: string;
-  amount?: string;
-  currency?: string;
+  amount: string;
+  currency: string;
 }
 
 // Bitcoin Data
 export interface BitcoinData {
   address: string;
-  amount?: string;
-  label?: string;
+  amount: string;
+  label: string;
 }
 
-export type QRTemplateData =
-  | URLData | VCardData | WiFiData | EmailData | SMSData | CalendarData | LocationData
-  | PhoneData | WhatsAppData | TelegramData | SocialMediaData | PayPalData | BitcoinData;
+// SEPA credit transfer (EPC069-12 "Girocode")
+export interface EPCData {
+  name: string;
+  iban: string;
+  bic: string;
+  amount: string;
+  remittance: string;
+}
+
+// Form data type of every template, keyed by template type
+export interface TemplateDataMap {
+  url: URLData;
+  vcard: VCardData;
+  wifi: WiFiData;
+  email: EmailData;
+  sms: SMSData;
+  calendar: CalendarData;
+  location: LocationData;
+  phone: PhoneData;
+  whatsapp: WhatsAppData;
+  telegram: TelegramData;
+  instagram: SocialMediaData;
+  twitter: SocialMediaData;
+  linkedin: SocialMediaData;
+  tiktok: SocialMediaData;
+  youtube: SocialMediaData;
+  facebook: SocialMediaData;
+  snapchat: SocialMediaData;
+  paypal: PayPalData;
+  bitcoin: BitcoinData;
+  epc: EPCData;
+}
+
+export type QRTemplateData = TemplateDataMap[QRTemplateType];
+
+// In-memory form state of every template (never persisted: it holds personal data)
+export type TemplateFormData = { [K in QRTemplateType]: TemplateDataMap[K] };
 
 export interface GradientConfig {
   enabled: boolean;
@@ -208,23 +245,24 @@ export const defaultEmailData: EmailData = {
 };
 
 export const defaultSMSData: SMSData = {
+  country: 'IT',
   countryCode: '+39',
   phone: '',
   message: '',
 };
 
-// Helper to get current datetime in format for datetime-local input
-const getCurrentDateTime = (): string => {
-  const now = new Date();
-  // Format: YYYY-MM-DDTHH:MM
-  return now.toISOString().slice(0, 16);
+// Format a date as YYYY-MM-DDTHH:MM in LOCAL time, as expected by datetime-local inputs
+// (toISOString would shift it to UTC)
+const toLocalDateTime = (date: Date): string => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
+// Helper to get current datetime in format for datetime-local input
+const getCurrentDateTime = (): string => toLocalDateTime(new Date());
+
 // Helper to get datetime 1 hour from now
-const getOneHourLater = (): string => {
-  const later = new Date(Date.now() + 60 * 60 * 1000);
-  return later.toISOString().slice(0, 16);
-};
+const getOneHourLater = (): string => toLocalDateTime(new Date(Date.now() + 60 * 60 * 1000));
 
 export const getDefaultCalendarData = (): CalendarData => ({
   title: '',
@@ -242,11 +280,13 @@ export const defaultLocationData: LocationData = {
 };
 
 export const defaultPhoneData: PhoneData = {
+  country: 'IT',
   countryCode: '+39',
   phone: '',
 };
 
 export const defaultWhatsAppData: WhatsAppData = {
+  country: 'IT',
   countryCode: '+39',
   phone: '',
   message: '',
@@ -273,97 +313,39 @@ export const defaultBitcoinData: BitcoinData = {
   label: '',
 };
 
-// Template definition with categories
-export interface TemplateDefinition {
-  type: QRTemplateType;
-  label: string;
-  category: TemplateCategory;
-  description: string;
-}
-
-export const templateDefinitions: TemplateDefinition[] = [
-  // Links
-  { type: 'url', label: 'URL', category: 'links', description: 'Website or link' },
-  // Contact & Messaging
-  { type: 'vcard', label: 'vCard', category: 'contact', description: 'Contact card' },
-  { type: 'email', label: 'Email', category: 'contact', description: 'Email message' },
-  { type: 'sms', label: 'SMS', category: 'contact', description: 'Text message' },
-  { type: 'phone', label: 'Phone', category: 'contact', description: 'Phone call' },
-  { type: 'whatsapp', label: 'WhatsApp', category: 'contact', description: 'WhatsApp message' },
-  { type: 'telegram', label: 'Telegram', category: 'contact', description: 'Telegram profile' },
-  // Social
-  { type: 'instagram', label: 'Instagram', category: 'social', description: 'Instagram profile' },
-  { type: 'twitter', label: 'Twitter/X', category: 'social', description: 'Twitter profile' },
-  { type: 'linkedin', label: 'LinkedIn', category: 'social', description: 'LinkedIn profile' },
-  { type: 'tiktok', label: 'TikTok', category: 'social', description: 'TikTok profile' },
-  { type: 'youtube', label: 'YouTube', category: 'social', description: 'YouTube channel' },
-  { type: 'facebook', label: 'Facebook', category: 'social', description: 'Facebook page' },
-  { type: 'snapchat', label: 'Snapchat', category: 'social', description: 'Snapchat profile' },
-  // Payment
-  { type: 'paypal', label: 'PayPal', category: 'payment', description: 'PayPal payment' },
-  { type: 'bitcoin', label: 'Bitcoin', category: 'payment', description: 'Bitcoin address' },
-  // Utilities (shown in 'all' or could add 'utilities' category)
-  { type: 'wifi', label: 'WiFi', category: 'links', description: 'WiFi credentials' },
-  { type: 'calendar', label: 'Event', category: 'links', description: 'Calendar event' },
-  { type: 'location', label: 'Location', category: 'links', description: 'Geo location' },
-];
-
-
+export const defaultEPCData: EPCData = {
+  name: '',
+  iban: '',
+  bic: '',
+  amount: '',
+  remittance: '',
+};
 
 export const dotTypes: DotType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded'];
 export const cornerSquareTypes: CornerSquareType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded', 'dot'];
 export const cornerDotTypes: CornerDotType[] = ['square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded', 'dot'];
 export const gradientTypes: GradientType[] = ['linear', 'radial'];
-export const errorCorrectionLevels: { value: ErrorCorrectionLevel; label: string; description: string }[] = [
-  { value: 'L', label: 'Low (L)', description: '~7% damage recovery. Best for clean environments.' },
-  { value: 'M', label: 'Medium (M)', description: '~15% damage recovery. Good balance of size and reliability.' },
-  { value: 'Q', label: 'Quartile (Q)', description: '~25% damage recovery. Good for moderate damage resistance.' },
-  { value: 'H', label: 'High (H)', description: '~30% damage recovery. Best when using center logo.' },
-];
-
-// Common country codes for phone numbers (generated from libphonenumber-js)
-const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
-
-// Priority countries to show at the top of the list
-const priorityCountries: CountryCode[] = ['IT', 'US', 'GB', 'DE', 'FR', 'ES'];
-
-const allCountryCodes = getCountries()
-  .map((countryCode) => ({
-    countryCode,
-    code: `+${getCountryCallingCode(countryCode)}`,
-    country: countryNames.of(countryCode) || countryCode,
-  }))
-  .sort((a, b) => a.country.localeCompare(b.country));
-
-// Put priority countries at the top, then the rest alphabetically
-export const countryCodes: { code: string; country: string }[] = [
-  ...priorityCountries
-    .map((cc) => allCountryCodes.find((c) => c.countryCode === cc)!)
-    .filter(Boolean)
-    .map(({ code, country }) => ({ code, country })),
-  ...allCountryCodes
-    .filter((c) => !priorityCountries.includes(c.countryCode))
-    .map(({ code, country }) => ({ code, country })),
-];
+export const errorCorrectionLevels: ErrorCorrectionLevel[] = ['L', 'M', 'Q', 'H'];
 
 // Local storage key
 export const STORAGE_KEY = 'qr-generator-settings';
 export const PRESETS_KEY = 'qr-generator-presets';
 
-// Color presets
+// Color presets (ids are translated in the UI: see qrOptions.colors.presets)
 export interface ColorPreset {
-  name: string;
   dotColor: string;
   cornerSquareColor: string;
   cornerDotColor: string;
   backgroundColor: string;
 }
 
-export const defaultColorPresets: ColorPreset[] = [
-  { name: 'Classic', dotColor: '#000000', cornerSquareColor: '#000000', cornerDotColor: '#000000', backgroundColor: '#ffffff' },
-  { name: 'Ocean', dotColor: '#0077b6', cornerSquareColor: '#023e8a', cornerDotColor: '#03045e', backgroundColor: '#caf0f8' },
-  { name: 'Forest', dotColor: '#2d6a4f', cornerSquareColor: '#1b4332', cornerDotColor: '#081c15', backgroundColor: '#d8f3dc' },
-  { name: 'Sunset', dotColor: '#e63946', cornerSquareColor: '#d62828', cornerDotColor: '#6a040f', backgroundColor: '#fff1e6' },
-  { name: 'Purple', dotColor: '#7b2cbf', cornerSquareColor: '#5a189a', cornerDotColor: '#3c096c', backgroundColor: '#e0aaff' },
-  { name: 'Monochrome', dotColor: '#333333', cornerSquareColor: '#1a1a1a', cornerDotColor: '#000000', backgroundColor: '#f5f5f5' },
+export type ColorPresetId = 'classic' | 'ocean' | 'forest' | 'sunset' | 'purple' | 'monochrome';
+
+export const defaultColorPresets: (ColorPreset & { id: ColorPresetId })[] = [
+  { id: 'classic', dotColor: '#000000', cornerSquareColor: '#000000', cornerDotColor: '#000000', backgroundColor: '#ffffff' },
+  { id: 'ocean', dotColor: '#0077b6', cornerSquareColor: '#023e8a', cornerDotColor: '#03045e', backgroundColor: '#caf0f8' },
+  { id: 'forest', dotColor: '#2d6a4f', cornerSquareColor: '#1b4332', cornerDotColor: '#081c15', backgroundColor: '#d8f3dc' },
+  { id: 'sunset', dotColor: '#e63946', cornerSquareColor: '#d62828', cornerDotColor: '#6a040f', backgroundColor: '#fff1e6' },
+  { id: 'purple', dotColor: '#7b2cbf', cornerSquareColor: '#5a189a', cornerDotColor: '#3c096c', backgroundColor: '#e0aaff' },
+  { id: 'monochrome', dotColor: '#333333', cornerSquareColor: '#1a1a1a', cornerDotColor: '#000000', backgroundColor: '#f5f5f5' },
 ];
