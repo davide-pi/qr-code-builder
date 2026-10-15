@@ -8,7 +8,7 @@
   background: var(--card-bg);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: 0 8px 24px var(--shadow-color);
 }
 

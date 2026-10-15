@@ -3,10 +3,10 @@ import type { Translations } from './types';
 export const it: Translations = {
   // Header
   header: {
-    title: 'Generatore QR Code',
+    title: 'QR Builder',
     switchToLight: 'Passa al tema chiaro',
     switchToDark: 'Passa al tema scuro',
-    logoAlt: 'Logo del generatore di QR Code',
+    tagline: 'gratis · senza account',
     language: 'Lingua',
   },
 
@@ -143,7 +143,6 @@ export const it: Translations = {
       errorCorrection: 'Correzione Errori',
       style: 'Stile',
       colors: 'Colori',
-      background: 'Sfondo',
       centerLogo: 'Logo Centrale',
       presets: 'I Miei Preset',
     },
@@ -177,6 +176,9 @@ export const it: Translations = {
       dotColor: 'Colore Punti',
       cornerSquare: 'Quadrato Angolare',
       cornerDot: 'Punto Angolare',
+      customColors: 'Colori personalizzati',
+      hexValue: '{name} (hex)',
+      invalidHex: 'Inserisci un colore come #1a2b3c o #abc',
       applyPreset: 'Applica il preset di colori {name}',
       presetNames: {
         classic: 'Classico',
@@ -252,6 +254,7 @@ export const it: Translations = {
       lowContrast: 'Contrasto basso tra codice e sfondo ({ratio}:1, consigliato almeno 4,5:1).',
       inverted: 'Il codice è più chiaro dello sfondo: molti lettori non leggono i QR invertiti.',
       logoNeedsHighEc: 'Un logo copre parte del codice: usa il livello di correzione errori Q o H.',
+      ok: 'Facile da scansionare',
     },
   },
 

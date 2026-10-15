@@ -78,7 +78,7 @@ so a root `netlify.toml` would never be read.
 | `script-src` | `'self'` | No inline scripts, no third-party scripts |
 | `style-src` | `'self' 'unsafe-inline'` | react-select (emotion) injects `<style>` elements at runtime; a nonce is not possible with static `_headers`. React `style={{...}}` props are set through the CSSOM and are not blocked by CSP. **To verify on a Netlify preview deploy** (open items in `TODO.md`) |
 | `img-src` | `'self' data: blob:` | Logo data URLs, inlined flag SVGs, rendered QR images |
-| `font-src` | `'self' data:` | Bundled fonts |
+| `font-src` | `'self' data:` | Self-hosted Sora and Manrope (`src/fonts.css`, woff2 emitted under `/assets/` and precached); no Google Fonts |
 | `connect-src` | `'self' data: blob:` | No third-party requests possible |
 | `worker-src` | `'self' blob:` | Service worker |
 | `manifest-src`, `base-uri`, `form-action` | `'self'` | |

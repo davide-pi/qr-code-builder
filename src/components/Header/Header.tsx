@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useId } from 'react';
-import { Sun, Moon, ChevronDown } from 'lucide-react';
+import { Sun, Moon, ChevronDown, QrCode } from 'lucide-react';
 import { useLanguage, availableLanguages } from '../../i18n';
 import { LanguageFlag } from '../Flags/Flags';
 import './Header.css';
@@ -101,12 +101,11 @@ export default function Header({ theme, onToggleTheme }: HeaderProps) {
     <header className="app-header">
       <div className="header-content">
         <div className="header-title">
-          <img
-            src={`${import.meta.env.BASE_URL}logo-white.svg`}
-            alt={t.header.logoAlt}
-            className="header-logo"
-          />
+          <span className="header-logo" aria-hidden="true">
+            <QrCode size={20} />
+          </span>
           <h1>{t.header.title}</h1>
+          <span className="header-pill">{t.header.tagline}</span>
         </div>
         <div className="header-actions">
           {/* Language Selector Dropdown */}
@@ -161,7 +160,7 @@ export default function Header({ theme, onToggleTheme }: HeaderProps) {
             onClick={onToggleTheme}
             aria-label={theme === 'dark' ? t.header.switchToLight : t.header.switchToDark}
           >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         </div>
       </div>

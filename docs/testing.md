@@ -55,6 +55,7 @@ after touching the preview, options, batch or PWA code.
 ### Styling, logo and presets
 
 - [ ] Dot / corner styles, gradient on/off, transparent background, built-in presets.
+- [ ] Custom swatch: selected when the colors match no preset, opens the panel; picker and hex box stay in sync; `abc` / `#abc` / `aabbcc` accepted, `#zz` shows an error and changes nothing; picking a preset deselects Custom.
 - [ ] Logo: file picker and drag and drop; PNG/JPEG/WebP/SVG accepted, other types and files over 2 MiB rejected with a message; error correction jumps to H.
 - [ ] Save a user preset, reload the page, apply it; delete it.
 - [ ] Export presets to JSON, delete them, import the file back; import a garbage file (error message) and one with the same names (replaced, not duplicated).

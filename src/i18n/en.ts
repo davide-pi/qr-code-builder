@@ -3,10 +3,10 @@ import type { Translations } from './types';
 export const en: Translations = {
   // Header
   header: {
-    title: 'QR Code Builder',
+    title: 'QR Builder',
     switchToLight: 'Switch to light mode',
     switchToDark: 'Switch to dark mode',
-    logoAlt: 'QR Code logo',
+    tagline: 'free · no account',
     language: 'Language',
   },
 
@@ -143,7 +143,6 @@ export const en: Translations = {
       errorCorrection: 'Error Correction',
       style: 'Style',
       colors: 'Colors',
-      background: 'Background',
       centerLogo: 'Center Logo',
       presets: 'My Presets',
     },
@@ -177,6 +176,9 @@ export const en: Translations = {
       dotColor: 'Dot Color',
       cornerSquare: 'Corner Square',
       cornerDot: 'Corner Dot',
+      customColors: 'Custom colors',
+      hexValue: '{name} (hex)',
+      invalidHex: 'Enter a color like #1a2b3c or #abc',
       applyPreset: 'Apply {name} color preset',
       presetNames: {
         classic: 'Classic',
@@ -252,6 +254,7 @@ export const en: Translations = {
       lowContrast: 'Low contrast between code and background ({ratio}:1, at least 4.5:1 recommended).',
       inverted: 'The code is lighter than the background: many scanners cannot read inverted QR codes.',
       logoNeedsHighEc: 'A logo covers part of the code: use error correction level Q or H.',
+      ok: 'Easy to scan',
     },
   },
 

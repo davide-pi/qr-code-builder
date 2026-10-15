@@ -3,26 +3,28 @@
 /* Control (the main input container) */
 .country-select__control {
   background-color: var(--input-bg) !important;
-  border-color: var(--border-color) !important;
-  border-radius: 6px !important;
-  min-height: 38px !important;
+  border-color: var(--input-border) !important;
+  border-radius: 12px !important;
+  min-height: 44px !important;
   box-shadow: none !important;
 }
 
 .country-select__control:hover {
-  border-color: var(--primary) !important;
+  border-color: var(--raised-border) !important;
 }
 
-.country-select__control--is-focused {
-  border-color: var(--primary) !important;
+.country-select__control--is-focused,
+.country-select__control--is-focused:hover {
+  border-color: var(--accent) !important;
+  box-shadow: var(--focus-shadow) !important;
 }
 
 /* Dropdown menu */
 .country-select__menu {
-  background-color: var(--card-bg) !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: 6px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  background-color: var(--card-bg-secondary) !important;
+  border: 1px solid var(--raised-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 16px 40px var(--shadow-color) !important;
   z-index: 100 !important;
 }
 
@@ -43,16 +45,16 @@
 
 .country-select__option:hover,
 .country-select__option--is-focused {
-  background-color: var(--hover-bg) !important;
+  background-color: var(--card-bg) !important;
 }
 
 .country-select__option--is-selected {
-  background-color: var(--primary) !important;
+  background-color: var(--accent) !important;
   color: white !important;
 }
 
 .country-select__option:active {
-  background-color: var(--primary) !important;
+  background-color: var(--accent) !important;
 }
 
 /* Selected value */

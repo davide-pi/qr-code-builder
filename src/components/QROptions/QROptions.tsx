@@ -1,8 +1,10 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useId } from 'react';
 import type { GradientType } from 'qr-code-styling';
 import type { QROptions as QROptionsType, GradientConfig, ColorPreset } from '../../types/qr';
 import { dotTypes, cornerSquareTypes, cornerDotTypes, gradientTypes, errorCorrectionLevels, defaultColorPresets } from '../../types/qr';
 import StylePicker, { DotStylePreview, CornerSquarePreview, CornerDotPreview } from '../StylePicker/StylePicker';
+import ColorField from './ColorField';
+import { matchesPreset } from './colorUtils';
 import UserPresets from './UserPresets';
 import { Undo2, Redo2, RotateCcw, ChevronDown, Upload, ChevronsDownUp, ChevronsUpDown } from 'lucide-react';
 import { useLanguage } from '../../i18n';
@@ -77,13 +79,16 @@ export default function QROptions({
     errorCorrection: false,
     style: true,
     colors: false,
-    background: false,
     logo: false,
     presets: false,
   });
+  const [customOpen, setCustomOpen] = useState(false);
+  const customPanelId = useId();
   const [logoError, setLogoError] = useState<LogoError | null>(null);
   const [ecRaisedByLogo, setEcRaisedByLogo] = useState(false);
   const errorCorrectionLevel = options.errorCorrectionLevel;
+  // Selected whenever the colors match no preset (free colors, gradient, transparent background)
+  const customActive = !defaultColorPresets.some((preset) => matchesPreset(options, preset));
 
   // Validate and read the logo file
   const processImageFile = useCallback((file: File) => {
@@ -154,7 +159,6 @@ export default function QROptions({
       errorCorrection: newState,
       style: newState,
       colors: newState,
-      background: newState,
       logo: newState,
       presets: newState,
     });
@@ -168,7 +172,7 @@ export default function QROptions({
     <div className="qr-options-section" role="form" aria-label={t.qrOptions.title}>
       <div className="options-header">
         <h2>{t.qrOptions.title}</h2>
-        <div className="header-actions">
+        <div className="options-actions">
           <button
             onClick={toggleAllSections}
             className="btn-icon"
@@ -295,149 +299,132 @@ export default function QROptions({
           >
             {defaultColorPresets.map((preset) => {
               const name = t.qrOptions.colors.presetNames[preset.id];
-              const isActive =
-                !options.dotGradient.enabled &&
-                !options.transparentBackground &&
-                options.dotColor === preset.dotColor &&
-                options.cornerSquareColor === preset.cornerSquareColor &&
-                options.cornerDotColor === preset.cornerDotColor &&
-                options.backgroundColor === preset.backgroundColor;
               return (
                 <button
                   key={preset.id}
+                  type="button"
                   className="preset-btn"
                   onClick={() => onApplyPreset(preset)}
                   title={name}
                   aria-label={t.qrOptions.colors.applyPreset.replace('{name}', name)}
-                  aria-pressed={isActive}
+                  aria-pressed={matchesPreset(options, preset)}
                   style={{
-                    background: `linear-gradient(135deg, ${preset.dotColor} 0%, ${preset.cornerSquareColor} 100%)`,
+                    background: `linear-gradient(135deg, ${preset.dotColor} 50%, ${preset.backgroundColor} 50%)`,
                   }}
                 />
               );
             })}
+            <button
+              type="button"
+              className="preset-btn preset-custom"
+              onClick={() => setCustomOpen((open) => !open)}
+              title={t.qrOptions.colors.customColors}
+              aria-label={t.qrOptions.colors.customColors}
+              aria-pressed={customActive}
+              aria-expanded={customOpen}
+              aria-controls={customPanelId}
+            />
           </div>
         </div>
 
-        <div className="option-group">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={options.dotGradient.enabled}
-              onChange={(e) => onUpdateGradient({ enabled: e.target.checked })}
+        <div
+          id={customPanelId}
+          className="custom-colors"
+          role="group"
+          aria-label={t.qrOptions.colors.customColors}
+          hidden={!customOpen}
+        >
+          {!options.dotGradient.enabled && (
+            <ColorField
+              label={t.qrOptions.colors.dotColor}
+              value={options.dotColor}
+              onChange={(color) => onUpdateOption('dotColor', color)}
             />
-            {t.qrOptions.colors.useGradient}
-          </label>
-        </div>
+          )}
 
-        {options.dotGradient.enabled ? (
-          <div className="gradient-options">
-            <div className="option-group">
-              <label htmlFor="gradientType">{t.qrOptions.colors.gradientType}</label>
-              <select
-                id="gradientType"
-                value={options.dotGradient.type}
-                onChange={(e) => onUpdateGradient({ type: e.target.value as GradientType })}
-              >
-                {gradientTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="option-group">
-              <label htmlFor="gradientRotation">{t.qrOptions.colors.rotation}: {options.dotGradient.rotation}°</label>
+          <div className="option-group">
+            <label className="checkbox-label">
               <input
-                type="range"
-                id="gradientRotation"
-                min="0"
-                max="360"
-                value={options.dotGradient.rotation}
-                onChange={(e) => onUpdateGradient({ rotation: Number(e.target.value) })}
+                type="checkbox"
+                checked={options.dotGradient.enabled}
+                onChange={(e) => onUpdateGradient({ enabled: e.target.checked })}
+              />
+              {t.qrOptions.colors.useGradient}
+            </label>
+          </div>
+
+          {options.dotGradient.enabled && (
+            <div className="gradient-options">
+              <div className="option-group">
+                <label htmlFor="gradientType">{t.qrOptions.colors.gradientType}</label>
+                <select
+                  id="gradientType"
+                  value={options.dotGradient.type}
+                  onChange={(e) => onUpdateGradient({ type: e.target.value as GradientType })}
+                >
+                  {gradientTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="option-group">
+                <label htmlFor="gradientRotation">{t.qrOptions.colors.rotation}: {options.dotGradient.rotation}°</label>
+                <input
+                  type="range"
+                  id="gradientRotation"
+                  min="0"
+                  max="360"
+                  value={options.dotGradient.rotation}
+                  onChange={(e) => onUpdateGradient({ rotation: Number(e.target.value) })}
+                />
+              </div>
+
+              <ColorField
+                label={t.qrOptions.colors.startColor}
+                value={options.dotGradient.colorStops[0].color}
+                onChange={(color) => onUpdateGradientColor(0, color)}
+              />
+              <ColorField
+                label={t.qrOptions.colors.endColor}
+                value={options.dotGradient.colorStops[1].color}
+                onChange={(color) => onUpdateGradientColor(1, color)}
               />
             </div>
+          )}
 
-            <div className="color-row">
-              <div className="option-group">
-                <label htmlFor="gradientColor1">{t.qrOptions.colors.startColor}</label>
-                <input
-                  type="color"
-                  id="gradientColor1"
-                  value={options.dotGradient.colorStops[0].color}
-                  onChange={(e) => onUpdateGradientColor(0, e.target.value)}
-                />
-              </div>
-              <div className="option-group">
-                <label htmlFor="gradientColor2">{t.qrOptions.colors.endColor}</label>
-                <input
-                  type="color"
-                  id="gradientColor2"
-                  value={options.dotGradient.colorStops[1].color}
-                  onChange={(e) => onUpdateGradientColor(1, e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        ) : (
           <div className="option-group">
-            <label htmlFor="dotColor">{t.qrOptions.colors.dotColor}</label>
-            <input
-              type="color"
-              id="dotColor"
-              value={options.dotColor}
-              onChange={(e) => onUpdateOption('dotColor', e.target.value)}
-            />
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={options.transparentBackground}
+                onChange={(e) => onUpdateOption('transparentBackground', e.target.checked)}
+              />
+              {t.qrOptions.background.transparent}
+            </label>
           </div>
-        )}
 
-        <div className="color-row">
-          <div className="option-group">
-            <label htmlFor="cornerSquareColor">{t.qrOptions.colors.cornerSquare}</label>
-            <input
-              type="color"
-              id="cornerSquareColor"
-              value={options.cornerSquareColor}
-              onChange={(e) => onUpdateOption('cornerSquareColor', e.target.value)}
-            />
-          </div>
-          <div className="option-group">
-            <label htmlFor="cornerDotColor">{t.qrOptions.colors.cornerDot}</label>
-            <input
-              type="color"
-              id="cornerDotColor"
-              value={options.cornerDotColor}
-              onChange={(e) => onUpdateOption('cornerDotColor', e.target.value)}
-            />
-          </div>
-        </div>
-      </Section>
-
-      {/* Background Section */}
-      <Section title={t.qrOptions.sections.background} isOpen={sectionsState.background} onToggle={() => toggleSection('background')}>
-        <div className="option-group">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={options.transparentBackground}
-              onChange={(e) => onUpdateOption('transparentBackground', e.target.checked)}
-            />
-            {t.qrOptions.background.transparent}
-          </label>
-        </div>
-
-        {!options.transparentBackground && (
-          <div className="option-group">
-            <label htmlFor="backgroundColor">{t.qrOptions.background.backgroundColor}</label>
-            <input
-              type="color"
-              id="backgroundColor"
+          {!options.transparentBackground && (
+            <ColorField
+              label={t.qrOptions.background.backgroundColor}
               value={options.backgroundColor}
-              onChange={(e) => onUpdateOption('backgroundColor', e.target.value)}
+              onChange={(color) => onUpdateOption('backgroundColor', color)}
             />
-          </div>
-        )}
+          )}
+
+          <ColorField
+            label={t.qrOptions.colors.cornerSquare}
+            value={options.cornerSquareColor}
+            onChange={(color) => onUpdateOption('cornerSquareColor', color)}
+          />
+          <ColorField
+            label={t.qrOptions.colors.cornerDot}
+            value={options.cornerDotColor}
+            onChange={(color) => onUpdateOption('cornerDotColor', color)}
+          />
+        </div>
       </Section>
 
       {/* Logo Section */}

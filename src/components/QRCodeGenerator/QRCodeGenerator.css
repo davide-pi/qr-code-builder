@@ -1,76 +1,47 @@
+/* Phones and tablets: one column, the page scrolls */
 .qr-generator {
   display: grid;
-  grid-template-columns: 1fr 1.25fr 1fr;
-  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
   max-width: 1600px;
   width: 100%;
   margin: 0 auto;
-  padding: 2rem;
-  height: 100%;
-  overflow: hidden;
+  padding: 24px 28px;
 }
 
-/* Large tablet breakpoint - switch to 2 columns (data+preview, options below) */
-@media (max-width: 1200px) {
+/* Tablet: data + preview side by side, options below */
+@media (min-width: 769px) {
   .qr-generator {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    gap: 1.5rem;
-    padding: 1.5rem;
-  }
-
-  .qr-generator > :nth-child(1) { /* QRDataInput */
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .qr-generator > :nth-child(2) { /* QRPreview */
-    grid-column: 2;
-    grid-row: 1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .qr-generator > :nth-child(3) { /* QROptions */
     grid-column: 1 / -1;
-    grid-row: 2;
   }
 }
 
-/* Tablet breakpoint */
-@media (max-width: 900px) {
+/* Desktop: 340px | 1fr | 340px, each column scrolls on its own */
+@media (min-width: 1201px) {
   .qr-generator {
-    gap: 1.25rem;
-    padding: 1.25rem;
+    grid-template-columns: 340px minmax(0, 1fr) 340px;
+    grid-template-rows: minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .qr-generator > :nth-child(3) {
+    grid-column: auto;
   }
 }
 
-/* Mobile breakpoint - stack all columns */
 @media (max-width: 768px) {
   .qr-generator {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    height: auto;
-    overflow: visible;
     padding: 1rem;
     gap: 1rem;
   }
-
-  .qr-generator > :nth-child(1) { /* QRDataInput */
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .qr-generator > :nth-child(2) { /* QRPreview */
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .qr-generator > :nth-child(3) { /* QROptions */
-    grid-column: 1;
-    grid-row: 3;
-  }
 }
 
-/* Small mobile breakpoint */
 @media (max-width: 480px) {
   .qr-generator {
     padding: 0.75rem;
