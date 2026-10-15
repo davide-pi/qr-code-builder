@@ -22,7 +22,7 @@ Bundle principale 892 → **377 kB**, CSS 448 → 28 kB, precache PWA 5,4 MiB �
 ## Prossimi passi
 
 1. [x] **Restyling grafico**: scelta la direzione A Aurora con il QR inclinato della B (canvas https://claude.ai/artifact/WNa9e2o8FXVpQopr8VWD8d); implementata con palette Personalizzata (127 test ok).
-   - [ ] Rigenerare icone PWA e og-image con la nuova palette; `public/logo-white.svg` non è più usato.
+   - [x] Rigenerare icone PWA e og-image con la nuova palette; `public/logo-white.svg` non è più usato.
 2. [ ] Prova manuale nel browser (gli agenti non hanno provato a mano): checklist in `docs/testing.md`, ogni template scansionato col telefono.
 3. [ ] Push del branch, deploy preview su Netlify e verifica della CSP dalla console.
 4. [ ] PR verso `main` (squash); la #20 di Dependabot si chiude, è assorbita da questo branch.
