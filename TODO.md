@@ -40,3 +40,9 @@ Bundle principale 892 → **377 kB**, CSS 448 → 28 kB, precache PWA 5,4 MiB �
 - Capacità: controllo solo byte-mode; un contenuto solo numerico molto lungo viene rifiutato prima del necessario.
 - Sezione "Sfondo" rimossa: trasparenza e colore di sfondo ora stanno nel pannello Personalizzato.
 - Il tema segue il sistema solo all'avvio (nessun listener su `prefers-color-scheme`).
+
+## Idee in coda (da scegliere)
+
+- Consigliate: lettore/decoder integrato + verifica reale della scansione; cornici "Scansionami" + modelli completi; link della configurazione di stile (`#style=…`, mai il contenuto).
+- Altre: anteprima su mockup reali, distanza minima di stampa, modalità guidata in 3 passi, scorciatoie da tastiera, palette dal logo, libreria di loghi pronti, bordo/ombra nell'export, export EPS/WebP, foglio di stampa A4 dal batch, link "aggiungi al calendario", UTM nel template URL, Web Share su mobile, nuovi template (testo, recensione Google, store, Meet/Zoom), test UI + Playwright in CI, Lighthouse CI, changelog e pagina "Novità", lingue ES/FR/DE, listener su `prefers-color-scheme`.
+- Escluse di proposito: QR dinamici, statistiche, account (serve un backend, rompe la promessa di privacy).
